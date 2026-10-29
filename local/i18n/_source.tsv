@@ -1,0 +1,234 @@
+02dnot/Jelly5	A native Jellyfin and Emby client for jailbroken PS5: its own liquid-glass interface, hardware-decoded 4K HDR
+abhi245y/spot5	Spot5 - a native, standalone Spotify app for jailbroken PS5 consoles
+Al-Azif/chukei-dns	Lightweight DNS relay server with DNS-over-HTTPS (DoH) and man-in-the-middle (MitM) functionality
+alfizari/PS5Debug-studio	All-in-one PS5 cheat & debug tool for ps5debug-NG: memory scanner, pointer scan, debugger, disassembler, function caller/logger, Python scripting and a cheat editor with .shn/.mc4/.json export
+ArkSama/PS5-Lapy-JB-Daemon	Standalone homebrew jailbreak daemon for PS5. Mimics etaHEN's jailbreak-on-demand API. Multi-firmware (3.00 to 12.00) via ps5-payload-sdk + kstuff. No etaHEN required.
+arwebSE/LibrePadPS5	Use your gamepad on PS5. Configurable USB and opt-in Bluetooth controllers with a LAN dashboard.
+aydencharles/kylin-core-release	kylin-core-release
+aydencharles/onionHEN	Yet another HEN enabler for jailbroken PS5
+barisyild/airpsx	Remote management software for Jailbroken PlayStation 4/5
+BestPig/BackPork	Lets you sideload system libraries into PS5 games
+bilawalriaz/nuvio-ps5-homebrew	Experimental Nuvio TV port with EVO native playback for jailbroken PS5 firmware 13.60. Source alpha.
+bizkut/unrar-ps5	PS5 UnRAR payload for extracting homebrew archives
+quatrixone/ProsperoAI	A simple LLM-based chat app that runs on the PS5 GPU
+Swordpdf/ProsperoEden	Experimental Eden port for PS5
+LedyBacer/ProsperoLight	An unofficial Moonlight port (game streaming) for PS5
+darkxex/ProsperoStore	Native PS5 app store for the homebrew catalog at ProsperoStore.net (title PPSA99000)
+ThatGuyKalvin/ProsperoTV	Native IPTV client for PlayStation 5 homebrew with an offline-first iptv-org catalog and hardware-accelerated H.264, HEVC, and VP9 playback.
+Blaze414/ps5-theme	Custom home-screen themes for jailbroken PS5 consoles (etaHEN plugin or standalone payload): backgrounds, icons, sounds, fonts and home music as read-only overlays.
+boazvdwansem/ps5-debugger	PS5 debugger payload — userland TCP wire-protocol server hosted inside SceShellCore. GPL-3.
+bornaradusin/Emby5	Native Emby client for PlayStation 5
+bps2414/lineup	Reorder the PS5 home-screen game row with the controller. Homebrew for jailbroken PS5, built with PS5 React.
+bps2414/visor-ps5	Mirror a Meta Quest 2 to the TV from a jailbroken PS5 - no PC, nothing to install on the headset
+BRGZ3/PS5-Log-Collector	Portable Windows app for streaming, timestamping, and saving KLOG from jailbroken PS5 consoles over TCP — no Netcat or extra runtime required.
+BrinooTk/castation	A Dreamcast emulator that runs natively on a jailbroken PlayStation 5, built on the Flycast core.
+BrinooTk/PS5X360	Experimental Xbox 360 emulator for PlayStation 5, built on Xenia Canary with native audio, DualSense input and RADV Vulkan graphics.
+bucanero/save-decrypters	Tools to decrypt specific PlayStation save-games (GTA5, TLOU, Uncharted 2, Uncharted 3, DmC, Diablo 3, Resident Evil, NFS, +++)
+c0w-ar/ps5-bar-tool	PS5 utility to parse and dump Backup and Restore files
+ChillQuant/direct-stream-ps5	High-speed parallel stream engine & local web dashboard for streaming HTTP/HTTPS downloads directly to PlayStation 5 FTP storage. Pure Python standard library, zero pip packages, macOS & Windows.
+CreamyG31337/ps5-tools	Small stdlib-only Python tools for jailbroken PS5s: orphaned-content scanner and SELF inspection/SDK-patching kit
+D3ATHLY/blackbox	BB
+Darkatek7/ProsperoThemes	Theme manager for the PS5 home screen (homebrew app, FW 13.00): community themes, apply and restore, USB import
+darkxex/SwanStationPS5	SwanStationPS5: a PlayStation 1 emulator running natively on jailbroken PS5, based on SwanStation. https://discord.gg/Drx8tsqq3B
+deepkicks/TitaniaPy	A Python CLI tool that parses, analyzes, and decrypts PS5 PUP/BLS files on PC — no console required. Features BLS extraction, Layer 3 firmware decryption, PBKDF2/KMB key derivation, and entropy-based key testing. One key away from full PUP decryption for all firmware versions.
+DevvNirvana/afterglow	Radio and visuals for PS5: 222 free internet radio stations, your own USB music, and 56 beat-synced scenes. Native homebrew app.
+diegobarbosaa/OmniPad-PS5	Universal controller engine & Web Dashboard for PlayStation 5 (FW 7.00 - 13.60)
+dmzebro/PS5_RPCS3	Re-upload of PS5_RPCS3
+dnullptr/AtmoxJB	PS5 magic that if ykyk
+drakmor/dlc_emu	Standalone PS5 replacement modules that expose DLC entries from config file
+drakmor/fan_target	PS5 fan controller
+drakmor/ftpsrv	A simple FTP server for jailbroken PS4s and PS5s
+drakmor/nanoDNS	Playstation 4/5 DNS proxy server
+drakmor/pgo_stub	A lightweight replacement module for the PlayGo runtime library on PlayStation 5
+drakmor/ShadowMountPlus	Automated background auto-mounter payload for jailbroken PS5 consoles. Detects, mounts, and installs game backups from internal or external storage, with support for UFS, exFAT, PFS, and nested compressed PFS containers.
+DV-list/Folder-updater-for-itsplk-PS5-Payloads-Mirror	A simple tool to track PS5 payload files in a local folder, check for updates, and keep them up to date.
+dyadf/luci-app-ps5block	OpenWrt/LuCI app that blocks PlayStation 5 system software updates (DNS, DoT/DoH, L3) while games, PSN and other devices keep working. podkop/zapret aware.
+earthonion/garlic-savemgr	A Local Save Manager for your PS5
+earthonion/garlic-worker	Help decrypt, encrypt, and resign PS4/PS5 saves
+elmonomalvad0/any-pad	bluetooth any pad in PS5
+elripalda/Porpoise-Dolphin-Emulator-for-PS5	A native GameCube and Wii emulator for jailbroken PS5, powered by Dolphin. Cover-flow library, box art, memory cards, original music.
+etaHEN/etaHEN	AIO HEN payload
+exFAT2AMPR/exfat2ampr	Convert PS5 game dumps to AMPR LZ4, right on the console. Made by V-10, LZ4 format by DLPSGAME.
+ezzy1231/pulse-deck	Dual-deck browser DJ app driven by a PS5 DualSense controller (React + Vite + WebHID + Web Audio)
+felipemelchior/driftcheck5	Controller tester for jailbroken PS5
+FGGstore/FGG-PlayPods	Hear your PS5 on any Bluetooth headset — game audio and system sounds streamed over the console's own Bluetooth, no dongle, DualSense stays wireless. Payload for jailbroken PS5.
+FGGstore/FGG-Unpack	Extract .zip and .7z archives directly on a jailbroken PlayStation 5. Drop an archive in a watched folder and it unpacks in place — upload 30 GB instead of 150.
+FGGstore/FGG-XSense	Use Xbox controllers on a jailbroken PlayStation 5. Reads GIP gamepads over USB and exposes them as a virtual PlayStation controller.
+gameboy829/PS5-LZ4-Game-Compressor	LZ4 game compression for PS5 homebrew — beta.1
+gasb07/ps4mount	Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage
+gcoding97/PS5-Game-Compressor	Standalone PS5 payload for compressing, unpacking, validating, and repairing ShadowMountPlus-mounted games
+GordonProsperoMan/xash3d-ps5	Half-Life (Xash3D FWGS) native homebrew port for PlayStation 5
+griches/PS5_DevilutionX	DevilutionX for the PlayStation 5: an installed title with controller, keyboard and mouse (source only)
+griches/PS5_DevTools	Crash reports and memory graphs for homebrew on a jailbroken PS5: a resident payload that records every crash with backtraces and graphs each title's memory, with a dashboard on your network.
+griches/PS5_Dusklight	Dusklight for PlayStation 5: a homebrew port on RADV (Aurora, Dawn WebGPU, SDL3). Bring your own disc image.
+griches/PS5_EternalDarkness	Eternal Darkness: Sanity's Requiem on the PS5 (homebrew), built from Eternal Darkness Recomp and your own disc
+griches/PS5_Ghostship	Super Mario 64 for PlayStation 5 homebrew: Ghostship (libultraship) on the PS5 Vulkan stack. No game data included.
+griches/PS5_SwitchWaker	The Wind Waker (GameCube) for PlayStation 5 homebrew: SwitchWaker on the PS5 Vulkan stack. No game data included.
+GronedWaffel/TacHen	TacHen beta: native PS5 menu and phone/PC web UI. Compatibility preview covers 67 exact profiles from 1.00–13.60; added firmware is untested. Original Beta 1 retained.
+Guernica4u/PKG-Master	A tool for PS4/PS5 games that allows you to seemlessly convert files (example: eboot.bin -> eboot.elf) making it easier to use them with AnyPS5 and other project whilst not having to worry about encryption with ShadPKG (ShadPS4 support soon)
+gzimbric/ps5-linux-porting	Evidence-driven notes and tools for porting the PS5 Linux loader across firmware
+HandshakeHackin/Nuvio-maxd-releases	Nuvio Max'd brings Nuvio to PS5 with synced watch progress, addon streams, episode skipping and experimental HDR10 playback. An unofficial native app, with public downloads and matching source.
+HaydenGriffin/afterglow-ps5	Unofficial Music Assistant player and MilkDrop visualiser for jailbroken PS5
+hebiii994/ps5-solobridge	PS5 game + system audio on a Focusrite Scarlett Solo (UAC2) over USB - resident payload for jailbroken PS5
+heydemoura/ps5-forwarder-manager	Forwarder Manager: native PS5 homebrew app to create and edit home-screen forwarders (port of ps5-forwarder.mph.am)
+hgr9519/ps5-wallpaper-modd	PS5 payload to change system wallpapers. Supports JPG, PNG, DDS. Backup/Restore, web interface.
+idlesauce/ps5-remoteplay-get-pin	Get Remote Play pairing PIN for offline activated accounts
+idlesauce/PS5-SELF-Decrypter	A portable payload to decrypt PS5 SELF files from the filesystem to USB drive
+idlesauce/ps5-self-pager	Yet another PS5 SELF decryptor
+illusionyy/ps5-fw-spoof	Patch PS4 SDK + PS5 Update version in kernel data to `99.99` without hardcoded offsets.
+ilyasturki/universe	Turn your Linux PC into a console. Steam, GOG, Epic, itch.io and emulators in one library, with PS5 and Switch 2 style interfaces.
+ItsBlurf/BFpilot	Lightweight PS5 file manager | browser based
+ItsBlurf/BFplayer	A PS5 media and video player that also functions as a complete media library, with support for subtitles, multiple audio tracks, aspect-ratio adjustment, cropping, and many other playback settings.
+ItsBlurf/PoorDS4	Use a wireless DualShock 4 in native PS5 games on jailbroken consoles.
+itsPLK/ps5-payload-manager	A modern, web-based dashboard to easily manage, import, and automatically load payloads on your PS5.
+itsPLK/ps5-pkg-manager	A clean and intuitive package manager for PS5
+itsPLK/ps5-webkit-autoloader	An automated payload loader for exploited PS5 consoles
+j4lenj/ps5-mt7921-wifi	MT7921 Wi-Fi. Tested only on PS5 Slim, firmware 13.60, Ubuntu 26.04.1 / kernel 7.1.7.
+jmelovich/Steam-Link-PS5	An unofficial Steam Remote Play client for PS5
+jstrdev/ps5directo	Herramienta de transferencia de archivos a PS5 por red local
+juma-sayeh/PS5-File-Explorer	Browser-based PS5 file explorer payload
+juma-sayeh/PS5-Game-Compressor	Standalone PS5 payload for compressing, unpacking, validating, and repairing ShadowMountPlus-mounted games
+JVK3R/JobeesLair	Standalone, content-neutral PS5 homebrew indexer and media framework. Proudly built alongside AI by JVK3R.
+kamb205/KB-RPCS3	Unofficial RPCS3 port for PlayStation 5 — run PS3 games as a native PS5 homebrew title. Alpha 0.1.0 source release.
+kasobos67/SwitchPS5	ProsperoEden with the full Switch UI
+kerrdec97/exFAT-Ripper	PS5 exFAT Library Scraper
+kerrdec97/Game-Catalogue	Closed-source Windows game catalogue browser. Binary releases only.
+kerrdec97/PFS-Ripper	Modern tool for browsing, managing and exporting PS5 PFS image libraries.
+kerrdec97/PS5-Backport-GUI	PS5 Backport — closed-source early testing beta. Windows x64; Linux and macOS to follow after Windows testing.
+kerrdec97/ps5-date-time-sync	Standalone PS5 payload that automatically restores the system date and time using public NTP servers.
+khalifa007/CapyMobile	Java phone games (J2ME) on the PS5: a native homebrew emulator app
+kiikeep/KIK-Trophy	PS5 trophy backup inspector and owner-ID editor for Windows.
+KINGDKAK/ProsperoPlayer	ProsperoPlayer 1.0 — jailbroken PS5 media player. Media home tile, HEVC/H.264, USB, subs, music.
+KINGDKAK/PS5-FFPFSC-PRO	PS5 FFPFSC PRO - PS5 Game Compression Utility
+knutwurst/ps5-patchdl	Official updates for your PS5 and PS4 games, from any browser. PatchDL runs on the PS5, finds the newest update for every installed game, downloads it with parallel connections and resume, and installs it on the console. Web UI for phone, laptop and TV, plus a home-screen tile. Runs on firmware 1.00 to 13.60.
+LaRazaDelSol/wings-app	A PS5 Frontend Solution for a Seamless & Frustration Free On-Device Experiences
+lavavex/rpcs3-PS5	EXPERIMENTAL: RPCS3 as a native PS5 title (RADV Vulkan, Big Picture Mode). Source only, personal use.
+lescanotomas/ps5-stream8	PS5 hardware H.264 game streaming prototype for firmware 13.60
+lescanotomas/ps5-stream8	PS5 hardware H.264 game streaming prototype for firmware 13.60
+Loopayeh/pkg-sender	PKG Sender — install PS4/PS5 packages over LAN. Pick games on PC, auto-find the console, queue and install. No USB, no manual IP.
+Loopayeh/pkg-viewer	PKG Viewer by Loopayeh: view PS3/PS4/PS5 package info and cover art
+louro2023/HLDRIVE	Gerenciador homebrew de arquivos para PS5 com Google Drive publico, downloads para o console e interface web. Versao experimental.
+lowbit/ps5-doom	Native DOOM for PS5: the original linuxdoom-1.10 source on AGC compute, DualSense and AudioOut, with a launcher that adds your own WADs from a PC or phone browser, a link or a folder, including zip, 7z and rar.
+LoZazaMastro/CD-Player	Rediscover your audio CDs and fall in love with your music again. A native PS5 CD player with a minimal digital interface.
+LoZazaMastro/Stremio-Plus	A PS5 Stremio homebrew app with a powerful torrent engine
+Lucidic15/ps5sx3-rpcn-configs	RPCN online configs for every game on the RPCS3 wiki's RPCN Compatibility List, for PS5SX3 (the PS3 emulator for PS5). Games with custom servers get their DNS or IP/Host switches.
+Marice/OliSePlayer	OliSe Player: a FastTracker II flavoured tracker-music radio for jailbroken PS5s, streaming MOD/XM/S3M/IT from The Mod Archive
+MasterPS0/Linux-desktop-wallpapers-for-PS5	Linux desktop wallpapers for PS5
+MasterPS0/PdbReaderGUI	PdbReaderGUI
+MasterPS0/PS5-Power-Payloads-Project	PS5 Power Payloads Project
+MasterPS0/ps5_yt_blocker	PS5 YT_Update_Blocker
+MasterPS0/PS5download0TOOL	==== PS5 download0.dat TOOL ====
+MasterPS0/PS5Themes	PS5Themes 2.00 -10.01
+menfis911/FGG-PlayPods-GUI	AudioBridge — GUI: PS5 Bluetooth A2DP Web GUI, based on FGG-PlayPods by FathiGhanem.
+mihawk-99/PS5_RetroArch	🎮 RetroArch Homebrew for the PS5 that supports 35 cores & 44 systems.
+MiladRTX/Breeze	Custom fan curve for the PS5: a payload with a web panel and a home screen app. Live CPU and GPU temps, 24-hour history and presets.
+MisterTemaki/beetlepcePS5	Port of Beetle PCE (Mednafen) as a native PS5 app: PC Engine / TurboGrafx-16, SuperGrafx, CD-ROM², Super CD-ROM², Arcade Card and TurboGrafx-CD in one emulator.
+MisterTemaki/fbneo-ps5	Port of Final Burn Neo for PS5
+MisterTemaki/fceummPS5	Port of FCEUmm for PS5
+MisterTemaki/genplusgxPS5	Port of Genesis-Plus-GX for PS5
+MisterTemaki/snes9xPS5	Port of Snes9x 1.63 for PS5
+mortaljinx/mortalfin	Native Jellyfin client for jailbroken PS5 consoles
+mortaljinx/Seedee5	Philips CD-i emulator for the PS5 (native homebrew title)
+mpereiraesaa/prospero-win	Windows compatibility runtime for native PlayStation 5 homebrew.
+naye1120/NayePlmTools	NayePlmTools — PS5 Payload Manager 中文分支（CN-FORK）：游戏改名/存档管理/背景音乐/主屏排序等增强
+nileshchakraborty/AstraPlay	AstraPlay is an open-source PS4/5 Remote Play client for Android, Android TV, iOS, macOS, Windows, Linux, and Steam Deck with internet play, console discovery, and app-store installs.
+NookieAI/kura	Scan, identify, organize, and transfer your PS1-PS5 & Vita game library (Windows, macOS, Linux), with a bundled PS5 payload for installs, cheats, saves, and fan control
+Not-eFootballer/NX-Controller-Tester	Nintendo Switch homebrew (.nro) to test your controllers: Joy-Con, DualShock 3 (PS3), DualShock 4 (PS4), DualSense (PS5) and PS1/PS2 controllers via the SuperBox 3 USB adapter. Buttons, sticks, drift, triggers, battery, rumble.
+notmaj0r/CheatRunner	Web-Based Cheat Trainer for PS5!
+notmaj0r/CheatRunner_Patches	A community collection of PS4 & PS5 game patches made for CheatRunner.
+notmaj0r/ProsperoMgr	All-In-One manager for your PS5!
+Pharaoh2k/ps5debug-NG	PS5 debugger payload - userland TCP wire-protocol server hosted inside SceShellCore. GPL-3.
+owendswang/ps5-aria2	aria2 for PS5
+owendswang/ps5-fan-control	Small PS5 daemon keeps applying fan temperature threshold.
+owendswang/ps5-web-file-manager	A file manager for PS5 with a web UI.
+owendswang/ps5-webkit-autoloader-esp32	ESP32 firmware: An automated payload loader for exploited PS5 consoles
+owenksmith24-tech/RPCS3-PS5-Port-Build-	This is a full build of KB-RPCS3 source code with changes and new features. 
+pedro9261/ps5-notify-app	Enviar notificaciones de la app movil hacia la ps5
+pegasus-ps5/pegasus-dl	Direct package downloading from your PS5
+phantomptr/ps5upload	Send games, apps and homebrew to a jailbroken PS5, and manage the console from your computer, phone or browser.
+pLabs5/pLinux5-NG	PS5 Linux for high FW's (8.xx, 9.xx, 10.xx, 11.xx, 12.xx, 13.xx)
+PlayKaraoke/PS5-PlayKaraoke-Player	Karaoke player for jailbroken PS5: CDG and MP4, real-time key change, singer rotation and song requests from phones via QR code.
+porhe911/Common-FPS-for-PS5	Common FPS for PS5 v1.0.0 First public stable release. Universal real-time FPS overlay for PS4 and PS5 games on PS5. This release includes both a standalone ELF and an etaHEN plugin.
+Portablelle/OpenNOW-PS5	Experimental native PS5 GeForce NOW client: a working, console-tested prototype with hardware decoding and GPU presentation.
+PratikHackTR/PS5-PHStore	Free Gaming Store app , Bedava Oyun Mağazası
+premohq/PS5-ECAM	Wii U, 3DS, DS, and Switch emulation for PS5 homebrew (Cemu + Azahar + Melon DS + Eden)
+ps5-linux/ps5-linux-image	Linux image builder
+ps5-linux/ps5-linux-loader	Linux payload implementing HV exploits to run a custom bootloader
+ps5-linux/ps5-linux-mwifiex	Linux mwifiex driver for PS5
+ps5-linux/ps5-linux-patches	Linux patches and configuration to run on PS5
+ps5-linux/ps5-linux-tools	Linux tools for PS5
+ps5-payload-dev/elfldr	An ELF loader for jailbroken PS5s that accepts payloads on port 9021
+ps5-payload-dev/ftpsrv	An FTP server for jailbroken PS4s and PS5s
+ps5-payload-dev/gdbsrv	A simple GDB server for jailbroken PS4s and PS5s
+ps5-payload-dev/klogsrv	A socket server for jailbroken PS4s and PS5s that redirects /dev/klog to sockets connected on port 3232
+ps5-payload-dev/sdk	An SDK for PS5 payloads that uses dynamic linking
+ps5-payload-dev/svtplay	An unofficial 10-foot webapp UI for svtplay.se
+ps5-payload-dev/websrv	A web server for jailbroken PS5s that accepts connections on port 8080
+ps5xploit/ps5shopappkg	ps5shopappkg
+quer3q/ps5-dump-forge	A toolkit for working with PS5 game dumps. Cross-platform - including the PS5 itself.
+RafaelNGP/pico8-ps5	Run the official PICO-8 (Linux build, bring your own license) as a native app on jailbroken PS5
+RafaelNGP/xbox-cloud-gaming-ps5	Xbox Cloud Gaming app for PS5 Homebrew
+RastaFairy/Visual-PS5	IDE for PS5 homebrew visual composer
+rdiol12/PS5Library	Native PS5Library console storefront. Frontend source and automated ELF builds.
+RobbedColek/PKGMerge	Join split retail PS4 and PS5 packages into a single PKG
+rodri0x/ps5-acestream	Experimental native Ace Stream player for jailbroken PS5: the engine runs on the console, with hardware H.264 decoding and a phone page to send channels.
+romanocry/EmuStore-PS5	Store homebrew PS5 à la manette — projet porté par RomainJ. 15 applications, sans mise à jour automatique. Prototype non testé sur console.
+S-Mohammad-A/Sani-PS5	Xbox One Series X/S controller Connected to PlayStation 5 With ESP32-S3 Over Remote Play (controller-only)
+s0liton/RommPS	A RomM server client for jailbroken PS5s. Download games from your server, full bi-directional save sync support, and extensible emulator profiles to quickly support new emulators as they release on the console.
+saawant12/orbit-store-ps5	A modern PS5 download manager with a native TV app, phone controls and Orbit Zero for Mac, Windows and Linux.
+SaveEditors/LightbarEditor	Desktop editor for PS5 shutdown-screen lightbar colors, particle palettes and ramp textures, with verified FTP transfers.
+seregonwar/MemDBG	MemDBG is a high-performance memory debugging and inspection suite designed for PlayStation 4 and PlayStation 5 homebrew research environments.
+seregonwar/PkgToolBox	Toolbox for analyzing and editing pkg application files for psp,ps3, ps4 and ps5, includes the most useful functions you might need.
+seregonwar/PSXTERM	Remote interactive terminal environment for exploited PlayStation 4 and PlayStation 5 systems.
+seregonwar/zftpd	Zero-copy FTP/HTTP Daemon compatible with all POSIX systems
+SloppyStakes/Prospero-Sender	An app meant to make it easy to send homebrew apps to the ps5.
+smoxa/ps5-new-overlay	Standalone in-game telemetry overlay for PlayStation 5 (Jailbreak) with real-time hardware monitoring, built-in Web configuration panel, and 12 live metrics
+Soonniicc/kstuff-a53	Integração nativa kstuff-lite + A53/PPR +backport em um único ELF, direto no Código-fonte, do Kstuff créditos e compilação documentados.
+Sp9nky/unofficial-stremio-ps5-port	Unofficial Stremio client for the PS5
+StonedModder/ActRemoteLink-13.x	Updated for FW 13.x - ActRemoteLink is a utility suite for PS5 workflows. It enables offline local account activation and Chiaki/Remote Play. Key features include changing account IDs offline, generating Remote Play PINs via system notifications, and monitoring successful pairing using a Python sender script to orchestrate the ELF payloads.
+StonedModder/ChronicLoader-PS5-Payload	Payload Updater & autoload.txt manager
+StonedModder/ps-game-state-lib	Standalone PS5 game-state detection payload, C library, and desktop GUI
+StonedModder/PShare	Native PS5 homebrew app that sends media gallery items to Discord, Telegram, catbox.moe, a USB drive, a shared folder on your PC or a dozen other places, automatically
+StonedModder/savemnt-offset-dumper	payload for the PlayStation 5 that resolves a set of firmware-specific offsets
+StonedModder/VITA5	Play a PS Vita on the PS5 over one USB cable.
+strongt1me/ps5-cooling-system-center-pro	Fan control, temperature monitoring and system center for the jailbroken PS5 – payload with a web UI (DE · EN · IT · ES · FR · RU) | Lüftersteuerung und Systemzentrale für die PS5
+strongt1me/PS5-Dump-Image-Converter	Converter Tool
+stupiditytries/kabuki-ps5	Kabuki: a native ShellUI control-centre overlay for the PS5 that homebrew can add tiles to
+sub0x00001/padbridge	Use controllers the PS5 does not accept as extra DualSense pads on a jailbroken PS5 (tested on 13.60): 8BitDo Ultimate 2C, 8BitDo USB Wireless Adapter 2 (DualSense, Switch Pro, GameSir G8...), wired XInput. Rumble in PS4 games, up to 4 pads, settings page.
+SvenGDK/Prospero-Explorer	A file explorer homebrew application for the PS5 console, written in C# on top of the SharpProspero SDK.
+SvenGDK/Prospero-Multi-Tools	PS5 Homebrew Backup Manager & Toolkit for PS1, PS2, PS3, PS4, PS5, PSP and PS Vita backups.
+sweenyxsky-oss/ps5-library-browser	Native PS5 Game Library Browser & Launcher with NFS support, ShadowMountPlus daemon lock, and Itemzflow-inspired UI
+Swordpdf/PS5SX2	A port of PCSX2 for PS5
+SynoPiia/PSXS5	PSXS5 (PlayStation X Super 5): a PlayStation 1 emulator running natively on jailbroken PS5, based on PCSX-ReARMed. Cover-flow shelf, xBR upscaling, RetroAchievements, cheats.
+TeeKay87/HEN-Cheats-Collection	The most complete cheats collection for the PS4 and PS5 with interactive cheats index
+tertiumndatur/ps5-cloud-play	A Chiaki-based cloud streaming client for PS5 that streams games from PS Plus Premium catalog.
+The7mirrors/5S2CD	Play your own PS2 game discs on a jailbroken PS5 (PS5 drive or USB DVD drive). A fork of PS5SX2 by swordpdf.
+The7mirrors/msx-ps5	MSX emulator for the PS5 with a 3D game shelf (blueMSX)
+The7mirrors/ps5-captures	PS5 homebrew app: send your screenshots and videos to your phone over Wi-Fi with a QR code. No account, no cloud.
+TheCriicom/omega-dashboard	Open-source replacement Home for homebrew-enabled consoles: open-source homebrew Store, customization, music and radio, phone remote, party chat, 27 languages. No piracy: no games, no game catalogues, no connection with Overdrive. Client (C/SDL2) + self-hostable server (Node.js).
+TheRealRetro/mupen64plus-ps5	Nintendo 64 emulator (mupen64plus-core 2.6.0) as a native PS5 home-screen app: dynarec, DualSense rumble, cover shelf, save states, auto-updates
+tsuramatsu1/apr-emu-updater	PS5 payload that keeps APR Emu up to date on installed titles, from a web interface on the console.
+tsuramatsu1/psp5	Native PSP port for the ps5 based on PPSSPP
+tsuramatsu1/Vita3K-PS5	Experimental PlayStation Vita emulator port for PS5
+TsvetomirGT/SymphonyStation5	A PS5 Homebrew Navidrome Client
+unicxrn/prospack	Pack, verify and send PS5 dumps as .ffpfsc, from your PC
+MeoWDev-MOD/Control-PS-5	Use o controle de PS5 (DualSense) no Switch com gatilhos adaptáveis, barra de luz, touchpad e perfis por jogo.
+VivaLaVent/PS5MC	PS5MC is a PS5 port of Kodi, the award-winning free and open source home theater/media center software and entertainment hub for digital media. With its beautiful interface and powerful skinning engine.
+X-F1REBALL-X/elf-launcher	Home screen and browser ELF payload launcher for a jailbroken PS5.
+X-F1REBALL-X/HearBridge-Browser	Stream PS5 console audio to any browser on your local network
+X-F1REBALL-X/HearBridge-PS5	Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5
+X-F1REBALL-X/wk-autoloader	PS5 jailbreak installed on the Store tile. Runs Relapse from the home screen, then opens Elf Launcher.
+xvvulcanvx/PS5-TabShifter	Standalone PS5 on-console payload to move apps between Games/Media tabs and hide offline PSN bloatware (Universal FW 5.00 – 13.60)
+Yahballon/PS5_Audiobook_Reader	The AEbook Reader bookshelf on PS5
+Yahballon/PS5_Ebook_Reader	The Ebook Reader bookshelf on PS5
+Yahballon/PS5CLEAN	This tool helps you 
+Yahballon/PS5GBAX	A native GBA emulator for jailbroken PS5
+Yahballon/PS5GBCX	A native GB/GBC emulator for jailbroken PS5
+Yahballon/PS5N64X	A native N64 emulator for jailbroken PS5
+Yahballon/PS5NESX	A native NES emulator for jailbroken PS5
+Yahballon/PS5SNESX	A native SNES emulator for jailbroken PS5 
+ZiZc3/LiveShell	Animated backgrounds for PS5 home screen.
+ZiZc3/Ruffle-Flash-PS5	PS5 Flash Emulator.
+ZiZc3/VLC	VLC for PS5.
+ZiZc3/XPSemu	Original Xbox emulator (Xemu) port for the PS5
+HandshakeHackin/youtube-maxd	Standalone YouTube app for jailbroken PS5s with Google sign-in, voice search, phone remote, family profiles, picture-in-picture, selectable video quality, SponsorBlock and DeArrow. Built on ProsperoTube and EVO Player.

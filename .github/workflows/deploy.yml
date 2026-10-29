@@ -1,0 +1,35 @@
+name: Mettre à jour la base de données des dépôts
+
+on:
+  schedule:
+    - cron: '0 * * * *' # S'exécute à chaque heure pile (minute 0)
+  workflow_dispatch: # Permet de lancer la mise à jour manuellement depuis l'onglet Actions de GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Cloner le dépôt
+        uses: actions/checkout@v4
+
+      - name: 2. Configurer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 3. Exécuter le script de mise à jour du JSON
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node scripts/update-db.js
+
+      - name: 4. Sauvegarder et commiter les modifications si le JSON a changé
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add json/repos-database.json
+          # Vérifie s'il y a des changements, si oui commit et push, sinon ne fait rien
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: mise à jour automatique des stats des repos [skip ci]" && git push)

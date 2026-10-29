@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PS5 插件更新中心</title>
+    <meta name="description" content="本地 PS5 插件同步与下载中心：中文介绍、今日更新、按需勾选下载。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img" aria-label="PS5">
+              <defs>
+                <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#5ee7ff" />
+                  <stop offset="100%" stop-color="#2f6bff" />
+                </linearGradient>
+              </defs>
+              <path d="M14 20 L32 10 L50 20 L50 44 L32 54 L14 44 Z" fill="none" stroke="url(#brandGrad)" stroke-width="3" />
+              <path d="M22 30 L30 34 L30 42 L22 38 Z" fill="url(#brandGrad)" />
+              <path d="M34 34 L42 30 L42 38 L34 42 Z" fill="url(#brandGrad)" opacity="0.65" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>PS5 插件更新中心</h1>
+            <p>本地同步 · 中文介绍 · 按需下载</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="sync-state" id="syncState">
+            <span class="dot"></span>
+            <span id="syncText">正在加载...</span>
+          </div>
+          <button class="btn ghost today-btn" id="todayBtn">
+            今日更新
+            <span class="count" id="todayCount">0</span>
+          </button>
+          <button class="btn ghost cheats-btn" id="cheatsBtn">
+            <svg viewBox="0 0 24 24" class="icon"><path d="m12 2 3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            金手指
+          </button>
+          <button class="btn ghost games-btn" id="gamesBtn">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 8h12a2 2 0 0 1 2 2v4a4 4 0 0 1-4 4h-1a2 2 0 0 1-2-2v-1h-2v1a2 2 0 0 1-2 2H8a4 4 0 0 1-4-4v-4a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/></svg>
+            游戏资源
+            <span class="count" id="gamesCount" hidden>0</span>
+          </button>
+          <button class="btn ghost history-btn" id="historyBtn">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            下载记录
+          </button>
+          <button class="btn primary" id="syncBtn">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M20 11a8 8 0 1 0-2.3 5.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            立即同步
+          </button>
+          <button class="icon-btn" id="settingsBtn" title="设置" aria-label="设置">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.4a7.9 7.9 0 0 0 0-2.8l2-1.5-2-3.4-2.3 1a8 8 0 0 0-2.4-1.4L14.4 2h-4.8l-.3 2.3a8 8 0 0 0-2.4 1.4l-2.3-1-2 3.4 2 1.5a7.9 7.9 0 0 0 0 2.8l-2 1.5 2 3.4 2.3-1a8 8 0 0 0 2.4 1.4l.3 2.3h4.8l.3-2.3a8 8 0 0 0 2.4-1.4l2.3 1 2-3.4-2-1.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="sidebar">
+          <div class="sidebar-head">
+            <span>项目分类</span>
+            <span id="categoryTotal" class="muted"></span>
+          </div>
+          <nav id="categoryList" class="category-list" aria-label="项目分类"></nav>
+        </aside>
+
+        <section class="content">
+          <div class="stats" id="stats"></div>
+
+          <div class="section-head" id="categoryHead"></div>
+
+          <div class="toolbar">
+            <div class="search">
+              <svg viewBox="0 0 24 24" class="icon"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input id="searchInput" type="search" placeholder="搜索插件名称、作者、标签或中文描述..." autocomplete="off" />
+            </div>
+            <div class="segmented" id="filterChips">
+              <button data-filter="all" class="active">全部</button>
+              <button data-filter="downloadable">有附件</button>
+              <button data-filter="recent">近期提交</button>
+              <button data-filter="updated">今日更新</button>
+            </div>
+            <select id="sortSelect" class="select" aria-label="排序方式">
+              <option value="recent">最近更新</option>
+              <option value="stars">星标最多</option>
+              <option value="name">名称排序</option>
+            </select>
+          </div>
+
+          <div class="grid" id="repoGrid"></div>
+
+          <div class="empty" id="emptyState" hidden>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            </div>
+            <h3>没有匹配的插件</h3>
+            <p>换个关键词，或切换分类与筛选条件试试。</p>
+          </div>
+        </section>
+      </main>
+
+      <div class="selection-bar" id="selectionBar" hidden>
+        <div class="selection-info">
+          <strong id="selCount">已选 0 个插件</strong>
+          <span id="selSize" class="muted">0 B</span>
+        </div>
+        <div class="selection-target" id="selTarget" title="">下载到：...</div>
+        <div class="selection-actions">
+          <button class="btn ghost" id="openDirBtn">打开目录</button>
+          <button class="btn ghost" id="clearSelBtn">清空</button>
+          <button class="btn primary" id="downloadBtn">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M12 4v11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m7 11 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            下载选中
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日更新弹窗 -->
+    <div class="modal-backdrop" id="todayModal" hidden>
+      <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="todayTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="todayTitle">今日更新插件</h2>
+            <p id="todaySub" class="muted"></p>
+          </div>
+          <button class="icon-btn close" data-close="todayModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="today-toolbar">
+            <div class="tabs" id="todayTabs">
+              <button data-tab="all" class="active">全部</button>
+              <button data-tab="added">新增</button>
+              <button data-tab="updated">更新</button>
+            </div>
+            <div class="today-actions">
+              <button class="btn ghost small" id="todaySelectAll">全选可下载项</button>
+            </div>
+          </div>
+          <div class="notice" id="todayNotice" hidden></div>
+          <div id="todayList" class="today-list"></div>
+          <div class="empty small" id="todayEmpty" hidden>
+            <h3>今日暂无新增或更新</h3>
+            <p>下次同步后，新插件和新版本会自动出现在这里。</p>
+          </div>
+        </div>
+        <footer class="modal-foot">
+          <span class="muted" id="todaySelInfo">已选 0 个</span>
+          <div class="foot-actions">
+            <button class="btn ghost" data-close="todayModal">关闭</button>
+            <button class="btn primary" id="todayDownloadBtn">下载选中</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 下载进度弹窗 -->
+    <div class="modal-backdrop" id="downloadModal" hidden>
+      <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="downloadTitle">正在下载插件</h2>
+            <p id="downloadSub" class="muted"></p>
+          </div>
+          <button class="icon-btn close" data-close="downloadModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="overall">
+            <div class="overall-top">
+              <span id="overallLabel">准备中...</span>
+              <span id="overallPercent" class="mono">0%</span>
+            </div>
+            <div class="progress"><div class="bar" id="overallBar" style="width:0%"></div></div>
+            <div class="overall-meta muted" id="overallMeta"></div>
+          </div>
+          <div id="downloadList" class="download-list"></div>
+        </div>
+        <footer class="modal-foot">
+          <span class="muted" id="downloadTarget"></span>
+          <div class="foot-actions">
+            <button class="btn danger" id="downloadCancelAll" hidden>取消全部</button>
+            <button class="btn ghost" id="downloadRetryFailed" hidden>重试失败文件</button>
+            <button class="btn ghost" id="downloadOpenDir">打开下载文件夹</button>
+            <button class="btn primary" data-close="downloadModal">关闭</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 文件选择弹窗：勾选的项目包含多个文件时，先让用户挑选要下载的文件 -->
+    <div class="modal-backdrop" id="assetModal" hidden>
+      <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="assetTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="assetTitle">选择要下载的文件</h2>
+            <p class="muted">勾选的项目包含多个文件，取消勾选不需要的，只下载需要的版本</p>
+          </div>
+          <button class="icon-btn close" data-close="assetModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div id="assetList" class="asset-pick-list"></div>
+        </div>
+        <footer class="modal-foot">
+          <span class="muted" id="assetPickMeta"></span>
+          <div class="foot-actions">
+            <button class="btn ghost small" id="assetPickAll">全选</button>
+            <button class="btn ghost small" id="assetPickNone">全不选</button>
+            <button class="btn primary" id="assetPickConfirm" disabled>开始下载</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="modal-backdrop" id="settingsModal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="settingsTitle">设置</h2>
+            <p class="muted">下载目录与同步选项</p>
+          </div>
+          <button class="icon-btn close" data-close="settingsModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <label class="field">
+            <span>下载目录</span>
+            <input id="settingsDir" type="text" spellcheck="false" />
+            <small class="muted">下载的插件文件会统一保存到这个目录，文件名带插件名和版本号，方便查找管理。</small>
+          </label>
+          <label class="switch-row">
+            <span>
+              <strong>保留旧版本</strong>
+              <small class="muted">关闭后，下载新版本成功时会删除同一插件的旧版本文件夹。</small>
+            </span>
+            <input id="settingsKeepOld" type="checkbox" />
+            <i class="switch" aria-hidden="true"></i>
+          </label>
+          <label class="switch-row">
+            <span>
+              <strong>启动时自动同步</strong>
+              <small class="muted">打开页面时如果数据不是今天，就自动拉取上游更新。</small>
+            </span>
+            <input id="settingsAutoSync" type="checkbox" />
+            <i class="switch" aria-hidden="true"></i>
+          </label>
+        </div>
+        <footer class="modal-foot">
+          <span></span>
+          <div class="foot-actions">
+            <button class="btn ghost" data-close="settingsModal">取消</button>
+            <button class="btn primary" id="settingsSave">保存设置</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 金手指同步弹窗 -->
+    <div class="modal-backdrop" id="cheatsModal" hidden>
+      <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="cheatsTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="cheatsTitle">金手指同步</h2>
+            <p id="cheatsSub" class="muted">HEN Cheats Collection · 基于 git 同步到本地独立目录</p>
+          </div>
+          <button class="icon-btn close" data-close="cheatsModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="cheats-status" id="cheatsStatus">
+            <div class="cs-row"><span class="cs-label">本地路径</span><span class="cs-val mono" id="cheatsPath">—</span></div>
+            <div class="cs-row"><span class="cs-label">状态</span><span class="cs-val" id="cheatsOk">—</span></div>
+            <div class="cs-row"><span class="cs-label">Git</span><span class="cs-val" id="cheatsGit">—</span></div>
+            <div class="cs-row"><span class="cs-label">Commit</span><span class="cs-val mono" id="cheatsCommit">—</span></div>
+            <div class="cs-row"><span class="cs-label">文件数</span><span class="cs-val" id="cheatsFileCount">0</span></div>
+            <div class="cs-row"><span class="cs-label">最后同步</span><span class="cs-val" id="cheatsLastAt">—</span></div>
+          </div>
+          <div class="cheats-output-head">同步日志</div>
+          <div class="cheats-output" id="cheatsOutput">尚未同步。点击「同步金手指」开始从上游仓库拉取。</div>
+          <div class="cheats-history-head">
+            <span>版本历史</span>
+            <small class="muted" id="cheatsHistoryMeta">—</small>
+          </div>
+          <div class="cheats-history" id="cheatsHistory">
+            <div class="muted" style="font-size:12px;padding:10px 0">尚未同步，暂无版本历史。</div>
+          </div>
+
+          <div class="cheats-files-head">
+            <span>金手指文件预览</span>
+            <small class="muted" id="cheatsFilesMeta">—</small>
+          </div>
+          <div class="cheats-files" id="cheatsFiles">
+            <div class="muted" style="font-size:12px;padding:10px 0">尚未同步，暂无文件。</div>
+          </div>
+        </div>
+        <footer class="modal-foot">
+          <span class="muted">数据来源：github.com/TeeKay87/HEN-Cheats-Collection</span>
+          <div class="foot-actions">
+            <button class="btn ghost" id="cheatsOpenDir">打开文件夹</button>
+            <button class="btn ghost" id="cheatsTranslate">翻译游戏名</button>
+            <button class="btn primary" id="cheatsSync">同步金手指</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 游戏资源弹窗 -->
+    <div class="modal-backdrop" id="gamesModal" hidden>
+      <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="gamesTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="gamesTitle">PS4 / PS5 游戏资源</h2>
+            <p id="gamesSub" class="muted">数据来源：2468c.com · 每日同步检测新增游戏</p>
+          </div>
+          <button class="icon-btn close" data-close="gamesModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="games-stats" id="gamesStats"></div>
+          <div class="games-toolbar">
+            <div class="tabs" id="gamesTabs">
+              <button data-tab="new" class="active">今日新增</button>
+              <button data-tab="ps5">PS5</button>
+              <button data-tab="ps4">PS4</button>
+            </div>
+            <div class="games-search">
+              <svg viewBox="0 0 24 24" class="icon" style="opacity:.5"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input id="gamesSearch" type="search" placeholder="搜索游戏名称..." autocomplete="off" />
+            </div>
+          </div>
+          <div class="games-output" id="gamesOutput" hidden></div>
+          <div id="gamesList" class="games-list"></div>
+          <div class="empty small" id="gamesEmpty" hidden>
+            <h3>暂无游戏数据</h3>
+            <p>点击「同步游戏」开始抓取 2468c.com 的游戏列表。</p>
+          </div>
+        </div>
+        <footer class="modal-foot">
+          <span class="muted" id="gamesMeta">—</span>
+          <div class="foot-actions">
+            <button class="btn ghost" id="gamesSyncQuick">快速同步</button>
+            <button class="btn primary" id="gamesSync">同步游戏</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 下载记录弹窗 -->
+    <div class="modal-backdrop" id="historyModal" hidden>
+      <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="historyTitle">下载记录</h2>
+            <p id="historySub" class="muted">历史下载的插件、版本、文件一览</p>
+          </div>
+          <button class="icon-btn close" data-close="historyModal" aria-label="关闭">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="history-toolbar">
+            <div class="history-search">
+              <svg viewBox="0 0 24 24" class="icon" style="opacity:.5"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input id="historySearch" type="search" placeholder="搜索插件名、作者、版本号..." autocomplete="off" />
+            </div>
+            <div class="history-range">
+              <button class="range-btn active" data-range="all">全部</button>
+              <button class="range-btn" data-range="today">今天</button>
+              <button class="range-btn" data-range="week">近 7 天</button>
+              <button class="range-btn" data-range="month">近 30 天</button>
+            </div>
+          </div>
+          <div id="historyList" class="history-list">
+            <div class="muted" style="font-size:12px;padding:20px 0;text-align:center">加载中...</div>
+          </div>
+        </div>
+        <footer class="modal-foot">
+          <span class="muted" id="historyCount">—</span>
+          <div class="foot-actions">
+            <button class="btn ghost" data-close="historyModal">关闭</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <div class="toast-wrap" id="toastWrap"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>

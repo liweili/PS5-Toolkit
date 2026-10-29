@@ -1,0 +1,11 @@
+{
+  "port": 8123,
+  "host": "127.0.0.1",
+  "downloadDir": ".\\local\\downloads",
+  "deleteOldVersions": true,
+  "autoSyncOnStart": true,
+  "syncIfOlderThanHours": 6,
+  "maxAutoTranslate": 30,
+  "translateEmail": "",
+  "openPageOnStart": false
+}

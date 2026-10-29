@@ -1,0 +1,106 @@
+{
+  "cat-PS5_Cheat": {
+    "name": "PS5 金手指 / 作弊工具",
+    "description": "内存修改、指针扫描、作弊码编辑与调试工具。"
+  },
+  "cat-PS5_Overlay": {
+    "name": "PS5 悬浮层",
+    "description": "在游戏画面之上叠加信息或控制面板的插件。"
+  },
+  "cat-PS5_Remote": {
+    "name": "PS5 远程控制",
+    "description": "远程操控、串流与遥控相关工具。"
+  },
+  "cat-ps5-webkit-autoloader": {
+    "name": "WebKit 自动加载器",
+    "description": "通过浏览器入口自动加载 payload 的工具。"
+  },
+  "cat-ps5_audio_utility": {
+    "name": "PS5 音频工具",
+    "description": "音频播放、音频输出与声音管理相关应用。"
+  },
+  "cat-ps5_dns": {
+    "name": "PS5 DNS 工具",
+    "description": "DNS 中继、DoH 与网络劫持相关服务。"
+  },
+  "cat-ps5_emulator": {
+    "name": "PS5 模拟器",
+    "description": "在 PS5 上运行其他平台游戏的模拟器。"
+  },
+  "cat-ps5_fan": {
+    "name": "PS5 风扇控制",
+    "description": "风扇转速与温度管理工具。"
+  },
+  "cat-ps5_file_explorer": {
+    "name": "PS5 文件管理器",
+    "description": "浏览、复制和管理 PS5 内置文件。"
+  },
+  "cat-ps5_freeshop": {
+    "name": "PS5 免费商店",
+    "description": "替代或扩展 PlayStation Store 的商店工具。"
+  },
+  "cat-ps5_game_dump": {
+    "name": "PS5 游戏提取",
+    "description": "提取游戏、补丁与 DLC 数据的工具。"
+  },
+  "cat-ps5_hen_loader": {
+    "name": "HEN 加载器",
+    "description": "加载 HEN 与 payload 的入口工具。"
+  },
+  "cat-ps5_kstuff": {
+    "name": "kstuff 内核补丁",
+    "description": "PS5 内核层面的补丁与破解组件。"
+  },
+  "cat-ps5_linux": {
+    "name": "PS5 Linux",
+    "description": "在 PS5 上安装和运行 Linux 发行版。"
+  },
+  "cat-ps5_pad_utility": {
+    "name": "PS5 手柄工具",
+    "description": "手柄映射、测试与自定义工具。"
+  },
+  "cat-ps5_pkg_tool": {
+    "name": "PS5 PKG 工具",
+    "description": "PKG 打包、解包与安装工具。"
+  },
+  "cat-ps5_saves": {
+    "name": "PS5 存档工具",
+    "description": "存档备份、恢复与迁移工具。"
+  },
+  "cat-ps5_sdk_debug": {
+    "name": "PS5 SDK 与调试",
+    "description": "PS5 自制程序 SDK、调试器与开发工具。"
+  },
+  "cat-ps5_server": {
+    "name": "PS5 服务端",
+    "description": "FTP、SMB、HTTP 等本地服务端。"
+  },
+  "cat-ps5_themes-avatars": {
+    "name": "PS5 主题与头像",
+    "description": "自定义 PS5 主题、头像与界面外观。"
+  },
+  "cat-ps5_utility": {
+    "name": "PS5 实用工具",
+    "description": "系统设置、维护与日常实用工具。"
+  },
+  "cat-ps5_video_player": {
+    "name": "PS5 视频播放器",
+    "description": "视频播放与媒体中心应用。"
+  },
+  "cat-ps5_cloud_gaming": {
+    "name": "PS5 云游戏",
+    "description": "云游戏客户端与串流工具。"
+  },
+  "cat-pc-ps5-dev": {
+    "name": "PC 端 PS5 开发",
+    "description": "在电脑上使用的 PS5 开发与调试工具。"
+  },
+  "cat-pc_apps": {
+    "name": "PC 应用",
+    "description": "配合 PS5 使用的电脑端应用。"
+  },
+  "unassigned": {
+    "name": "未分类",
+    "description": "暂未归类的项目。"
+  }
+}

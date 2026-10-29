@@ -1,0 +1,27 @@
+# ---------- 本地应用运行时数据 ----------
+local/downloads/
+local/logs/
+local/state/
+local/cheats/
+
+# ---------- 构建产物 ----------
+# 应用打包暂存区
+dist/app/
+# 安装器编译中间文件
+dist/installer/*-src/
+dist/installer/*.zip
+dist/installer/installer.exe
+dist/installer/wrapper.exe
+# 最终发布二进制（如需纳入版本管理可注释掉）
+dist/release/*.exe
+dist/release/*.zip
+dist/release/*.msi
+
+# ---------- git 备份（临时 re-init 产生） ----------
+.git.*-backup/
+
+# ---------- 通用 ----------
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
