@@ -11,6 +11,18 @@ PS5-Toolkit 是一个**完全本地运行**的 PS5 资源管理工具。它在�
 
 不依赖第三方服务、不需要登录账号、不上传任何数据。所有运行状态与下载记录保存在本地 `local/state/`，删除该目录即彻底清除。
 
+## 下载安装
+
+前往 **[Releases](https://github.com/liweili/PS5-Toolkit/releases/latest)** 下载：
+
+| 文件 | 大小 | 说明 |
+|---|---|---|
+| `PS5-Plugin-Hub-Setup.exe` | 32.7 MB | **安装版**，带桌面快捷方式，推荐普通用户 |
+| `PS5-Plugin-Hub.exe` | 32.7 MB | **便携版**，免安装，双击即用 |
+| `PS5-Plugin-Hub.zip` | 1.6 MB | **脚本版**，解压后运行 `local\start.ps1`，适合查看/修改源码 |
+
+> 系统要求：Windows 10 / 11 + Node.js 18+（Git 可选，未安装时自动改用 GitHub 直连下载）。
+
 ## 界面预览
 
 **主界面 · 插件仓库中心**

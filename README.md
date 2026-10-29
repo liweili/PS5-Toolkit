@@ -1,5 +1,9 @@
 # PS5-Toolkit
 
+![Release](https://img.shields.io/github/v/release/liweili/PS5-Toolkit?label=release)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-blue)
+![Node](https://img.shields.io/badge/node-18%2B-green)
+
 > **⚠️ 项目来源声明 / Attribution**
 >
 > 本项目 **基于 [nexgen999/PS5-Repository-List](https://github.com/nexgen999/PS5-Repository-List) 改造开发**。
@@ -15,6 +19,18 @@
 PS5-Toolkit 是一个**完全本地运行**的 PS5 资源管理工具。它在你自己电脑上启动一个轻量 Node.js 服务（默认 `http://127.0.0.1:8123`），用浏览器打开即是一个中文控制台，把「插件仓库浏览 / 每日更新 / 按需下载 / 金手指同步 / 游戏资源追踪」全部收在一个页面里。
 
 不依赖任何第三方服务、不需要登录账号、不上传任何数据；所有状态与下载记录都保存在本地 `local/state/`，删掉目录即彻底清除。
+
+### 下载安装
+
+前往 **[Releases](https://github.com/liweili/PS5-Toolkit/releases/latest)** 下载：
+
+| 文件 | 大小 | 说明 |
+|---|---|---|
+| `PS5-Plugin-Hub-Setup.exe` | 32.7 MB | **安装版**，带桌面快捷方式，推荐普通用户 |
+| `PS5-Plugin-Hub.exe` | 32.7 MB | **便携版**，免安装，双击即用 |
+| `PS5-Plugin-Hub.zip` | 1.6 MB | **脚本版**，解压后运行 `local\start.ps1`，适合查看/修改源码 |
+
+> 系统要求：Windows 10 / 11 + Node.js 18+（Git 可选，未安装时自动改用 GitHub 直连下载）。
 
 ### 界面预览
 
