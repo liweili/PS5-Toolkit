@@ -16,6 +16,24 @@ PS5-Toolkit 是一个**完全本地运行**的 PS5 资源管理工具。它在�
 
 不依赖任何第三方服务、不需要登录账号、不上传任何数据；所有状态与下载记录都保存在本地 `local/state/`，删掉目录即彻底清除。
 
+### 界面预览
+
+**主界面 · 插件仓库中心**（分类侧栏 + 统计卡片 + 插件卡片网格）
+
+<img src="docs/screenshots/02-main.png" width="1100" alt="主界面">
+
+**今日更新 · 只列出当天新增与版本变化的条目，可直接勾选下载**
+
+<img src="docs/screenshots/01-today-updates.png" width="1100" alt="今日更新">
+
+**PS4 / PS5 游戏资源 · 今日新增独立展示，点击卡片直达游戏详情页**
+
+<img src="docs/screenshots/03-games.png" width="1100" alt="游戏资源">
+
+**金手指同步 · HEN Cheats 版本历史与中文对照**
+
+<img src="docs/screenshots/04-cheats.png" width="1100" alt="金手指同步">
+
 ### 具体功能
 
 **1. 插件仓库中心（核心）**
