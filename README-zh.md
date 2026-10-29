@@ -1,6 +1,6 @@
-# PS5 插件更新中心（本地版）
+# PS5-Toolkit（原 PS5 插件更新中心）
 
-基于 [nexgen999/PS5-Repository-List](https://github.com/nexgen999/PS5-Repository-List) 的本地化版本，提供全中文界面、每日同步、按需下载、金手指同步等功能。
+基于 [nexgen999/PS5-Repository-List](https://github.com/nexgen999/PS5-Repository-List) 的本地化改造项目，提供全中文界面、插件更新、金手指同步、PS4/PS5 游戏资源每日新增检测等功能。
 
 ## 功能
 
@@ -8,7 +8,8 @@
 - 每日 09:00 定时同步上游仓库，识别新增 / 更新插件
 - 首次打开自动弹出「今日更新」
 - 按需勾选下载，支持多文件、断点续传、旧版本清理
-- 金手指（HEN Cheats Collection）同步与版本历史
+- **PS4 / PS5 游戏资源同步**：抓取 2468c.com，每日自动检测新增游戏
+- **金手指（HEN Cheats Collection）** 同步与版本历史
 - 响应式布局，适配手机 / 平板
 
 ## 安装（Windows）
