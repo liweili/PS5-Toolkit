@@ -27,23 +27,23 @@ PS5-Toolkit 是一个**完全本地运行**的 PS5 资源管理工具。它在�
 
 **① 今日插件更新** — 只列出当天新增与版本变化的插件，显示版本号对比与文件大小，可直接勾选下载
 
-<img src="docs/screenshots/01-today-updates.png" width="1100" alt="今日插件更新">
+<img src="docs/screenshots/01-today-updates.jpg" width="1100" alt="今日插件更新">
 
 **② 首页效果** — 分类侧栏 + 统计卡片 + 插件卡片网格，支持关键词搜索与多字段排序
 
-<img src="docs/screenshots/02-home.png" width="1100" alt="首页效果">
+<img src="docs/screenshots/02-home.jpg" width="1100" alt="首页效果">
 
 **③ 金手指更新及记录显示** — 数据来源 [TeeKay87/HEN-Cheats-Collection](https://github.com/TeeKay87/HEN-Cheats-Collection)，含 Git 提交记录、版本历史与中文对照
 
-<img src="docs/screenshots/03-cheats.png" width="1100" alt="金手指更新及记录">
+<img src="docs/screenshots/03-cheats.jpg" width="1100" alt="金手指更新及记录">
 
 **④ PS4 / PS5 游戏显示及下载路径** — 数据来源 [2468c.com](https://2468c.com)，今日新增独立展示，点击卡片直达游戏详情页
 
-<img src="docs/screenshots/04-games.png" width="1100" alt="PS4/PS5 游戏资源">
+<img src="docs/screenshots/04-games.jpg" width="1100" alt="PS4/PS5 游戏资源">
 
 **⑤ 设置** — 自定义下载路径；金手指通过 Git 拉取到本地，下载文件同样保存到本地并按规则命名
 
-<img src="docs/screenshots/05-settings.png" width="1100" alt="设置">
+<img src="docs/screenshots/05-settings.jpg" width="1100" alt="设置">
 
 ## 具体功能
 
