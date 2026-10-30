@@ -3,6 +3,8 @@ local/downloads/
 local/logs/
 local/state/
 local/cheats/
+# 误建的嵌套下载目录（测试残留）
+local/local/
 
 # ---------- 构建产物 ----------
 # 应用打包暂存区

@@ -26,11 +26,3 @@ if ($gitCmd -and (Test-Path (Join-Path $cheatsDir '.git'))) {
   $gstamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
   Add-Content -Path $log -Value ("[" + $gstamp + "] 金手指同步`r`n" + (($gout + $rout) -join "`r`n") + "`r`n") -Encoding UTF8
 }
-
-# 每日快速同步 PS4/PS5 游戏资源（仅首页几页，抓取当日新增）
-$gamesScript = Join-Path $local 'scripts\sync-games.js'
-if (Test-Path $gamesScript) {
-  $gamesOut = & $nodeCmd.Source --use-system-ca $gamesScript --quick 2>&1
-  $gamesStamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-  Add-Content -Path $log -Value ("[" + $gamesStamp + "] 游戏资源快速同步`r`n" + ($gamesOut -join "`r`n") + "`r`n") -Encoding UTF8
-}

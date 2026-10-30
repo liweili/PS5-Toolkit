@@ -1704,186 +1704,14 @@ button {
   font-size: 11px;
 }
 
-/* ---------- 游戏资源 ---------- */
+/* ---------- 游戏资源（外链按钮） ---------- */
 .games-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-}
-
-.games-stats {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.games-stats .gs-item {
-  flex: 1 1 120px;
-  min-width: 0;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.games-stats .gs-label {
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: .3px;
-}
-.games-stats .gs-val {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--fg);
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.games-stats .gs-val.highlight {
-  color: #86efac;
-  text-shadow: 0 0 12px rgba(134, 239, 172, 0.3);
-}
-.games-stats .gs-val.muted {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.games-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.games-search {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 4px 10px;
-}
-.games-search input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--fg);
-  font-size: 13px;
-  padding: 3px 0;
-}
-
-.games-output {
-  background: #0b0e14;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 12px;
-  color: #a5f3fc;
-  height: 120px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  margin-bottom: 12px;
-}
-
-.games-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 12px;
-  padding-bottom: 4px;
-}
-
-.gm-card {
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
-  overflow: hidden;
   text-decoration: none;
-  color: inherit;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-}
-.gm-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(94, 231, 255, 0.35);
-  box-shadow: 0 8px 24px rgba(94, 231, 255, 0.12);
 }
 
-.gm-cover {
-  width: 100%;
-  aspect-ratio: 5 / 4;
-  object-fit: cover;
-  display: block;
-  background: rgba(255, 255, 255, 0.04);
-}
-.gm-cover-placeholder {
-  display: grid;
-  place-items: center;
-  font-size: 36px;
-  background: linear-gradient(135deg, rgba(47, 107, 255, 0.12), rgba(94, 231, 255, 0.08));
-}
-
-.gm-body {
-  padding: 10px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-}
-
-.gm-title {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--fg);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.gm-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  margin-top: auto;
-}
-
-.gm-plat {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  letter-spacing: .5px;
-}
-.gm-plat.plat-ps5 {
-  background: rgba(47, 107, 255, 0.22);
-  color: #8ab4ff;
-}
-.gm-plat.plat-ps4 {
-  background: rgba(52, 211, 153, 0.18);
-  color: #86efac;
-}
-
-.gm-date {
-  font-size: 11px;
-  color: var(--muted);
-}
 
 /* ---------- 下载记录 ---------- */
 .history-btn {
@@ -2227,24 +2055,6 @@ html {
   .ch-version { min-width: 0; }
   .ch-status-zh { width: auto; }
   .cheats-files { height: 96px; }
-  .games-stats .gs-item {
-    flex: 1 1 calc(50% - 5px);
-    padding: 8px 10px;
-  }
-  .games-stats .gs-val { font-size: 15px; }
-  .games-toolbar { gap: 8px; }
-  .games-search {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-  .games-output { height: 100px; }
-  .games-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  .gm-body { padding: 8px 10px 10px; }
-  .gm-title { font-size: 12px; }
-  .gm-date { display: none; }
   .history-toolbar { gap: 8px; }
   .history-search {
     flex: 1 1 100%;

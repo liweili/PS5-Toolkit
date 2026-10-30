@@ -29,10 +29,6 @@ const state = {
   jobDoneFor: null,
   cheats: null,
   cheatsPollTimer: null,
-  games: null,
-  gamesPollTimer: null,
-  gamesTab: 'new',
-  gamesSearch: '',
   downloadHistory: [],
   historyRange: 'all',
   historySearch: ''
@@ -168,19 +164,8 @@ function renderAll() {
   renderHead();
   renderRepos();
   renderToday();
-  renderGamesBadge();
   updateSelectionUI();
   updateSyncUI((state.overview && state.overview.sync) || {});
-}
-
-function renderGamesBadge() {
-  const g = state.overview && state.overview.games ? state.overview.games : null;
-  const count = g ? g.todayTotal || 0 : 0;
-  const badge = $('gamesCount');
-  if (badge) {
-    badge.textContent = count;
-    badge.hidden = count === 0;
-  }
 }
 
 /* ---------- 概览 ---------- */
@@ -966,6 +951,12 @@ function renderCheatsModal() {
   if (data.lastError) {
     $('cheatsOutput').textContent += '\n[错误] ' + data.lastError;
   }
+  if (data.kylinRunning || data.kylinOutput || data.kylinLastError) {
+    $('cheatsOutput').textContent +=
+      '\n\n[整理金手指 kylin]' + (data.kylinRunning ? '（进行中）' : '') + '\n' +
+      (data.kylinOutput || '') +
+      (data.kylinLastError ? '\n[错误] ' + data.kylinLastError : '');
+  }
 
   const files = data.files || [];
   const more = data.totalFileCount > files.length ? `（仅显示前 ${files.length} 个）` : '';
@@ -1029,11 +1020,22 @@ function renderCheatsModal() {
       syncBtn.textContent = data.exists && data.gitOk ? '更新金手指' : '同步金手指';
     }
   }
+
+  const kylinBtn = $('cheatsKylin');
+  if (kylinBtn) {
+    if (data.kylinRunning) {
+      kylinBtn.disabled = true;
+      kylinBtn.textContent = '整理中...';
+    } else {
+      kylinBtn.disabled = !data.exists || !data.gitOk || !data.kylinAvailable || !!data.running;
+      kylinBtn.textContent = '整理金手指（kylin）';
+    }
+  }
 }
 
 function cheatsBusy(data) {
   const tr = data && data.history && data.history.translation;
-  return !!(data && (data.running || (tr && tr.running)));
+  return !!(data && (data.running || data.kylinRunning || (tr && tr.running)));
 }
 
 function openCheatsModal() {
@@ -1089,6 +1091,36 @@ async function runCheatsSync() {
   }
 }
 
+async function runKylinPrep() {
+  if (!state.cheats || cheatsBusy(state.cheats)) return;
+  const btn = $('cheatsKylin');
+  if (btn) { btn.disabled = true; btn.textContent = '整理中...'; }
+  try {
+    const res = await api('/api/cheats/kylin', { method: 'POST' });
+    if (!res.started) {
+      toast(res.message || '无法开始整理', 'error');
+      await fetchCheats();
+      return;
+    }
+    toast('正在整理金手指（kylin）…');
+    clearInterval(state.cheatsPollTimer);
+    state.cheatsPollTimer = setInterval(async () => {
+      try {
+        const data = await fetchCheats();
+        if (!data.kylinRunning) {
+          clearInterval(state.cheatsPollTimer);
+          state.cheatsPollTimer = null;
+          if (data.kylinLastError) toast(`整理失败：${data.kylinLastError}`, 'error');
+          else toast(`金手指整理完成，已生成 ${data.kylinFileCount || 0} 个文件（data/kylin/cheats）`, 'success');
+        }
+      } catch {}
+    }, 1500);
+  } catch (err) {
+    toast(`启动整理失败：${err.message}`, 'error');
+    fetchCheats();
+  }
+}
+
 async function runTitleTranslate() {
   if (!state.cheats) return;
   const btn = $('cheatsTranslate');
@@ -1116,177 +1148,6 @@ async function runTitleTranslate() {
   } catch (err) {
     toast(`启动翻译失败：${err.message}`, 'error');
     fetchCheats();
-  }
-}
-
-/* ---------- 游戏资源（PS4/PS5） ---------- */
-async function fetchGames() {
-  const data = await api('/api/games');
-  state.games = data;
-  renderGamesModal();
-  return data;
-}
-
-function renderGamesModal() {
-  const data = state.games;
-  if (!data) return;
-
-  const ps5Total = data.ps5Total || 0;
-  const ps4Total = data.ps4Total || 0;
-  const todayNew = data.todayTotal || 0;
-  const snapshotAt = data.snapshotUpdatedAt || '—';
-
-  $('gamesStats').innerHTML = `
-    <div class="gs-item"><span class="gs-label">今日新增</span><span class="gs-val highlight">${todayNew}</span></div>
-    <div class="gs-item"><span class="gs-label">PS5 收录</span><span class="gs-val">${formatNumber(ps5Total)}</span></div>
-    <div class="gs-item"><span class="gs-label">PS4 收录</span><span class="gs-val">${formatNumber(ps4Total)}</span></div>
-    <div class="gs-item"><span class="gs-label">快照时间</span><span class="gs-val muted">${esc(snapshotAt)}</span></div>
-  `;
-
-  const ps5New = data.todayPs5 || [];
-  const ps4New = data.todayPs4 || [];
-  $('gamesTabs').innerHTML = `
-    <button data-tab="new" class="${state.gamesTab === 'new' ? 'active' : ''}">今日新增 ${todayNew}</button>
-    <button data-tab="ps5" class="${state.gamesTab === 'ps5' ? 'active' : ''}">PS5 ${formatNumber(ps5Total)}</button>
-    <button data-tab="ps4" class="${state.gamesTab === 'ps4' ? 'active' : ''}">PS4 ${formatNumber(ps4Total)}</button>
-  `;
-
-  // 输出日志
-  const out = $('gamesOutput');
-  if (data.running) {
-    out.hidden = false;
-    out.textContent = data.output || '同步中...';
-  } else {
-    out.hidden = true;
-  }
-
-  // 渲染列表
-  renderGamesList();
-
-  // 同步按钮状态
-  const syncBtn = $('gamesSync');
-  const quickBtn = $('gamesSyncQuick');
-  if (syncBtn) {
-    syncBtn.disabled = data.running;
-    syncBtn.textContent = data.running ? '同步中...' : '同步游戏';
-  }
-  if (quickBtn) {
-    quickBtn.disabled = data.running;
-    quickBtn.textContent = data.running ? '同步中...' : '快速同步';
-  }
-
-  $('gamesMeta').textContent = data.running
-    ? '正在同步，请稍候...'
-    : (data.lastError ? `上次失败：${data.lastError}` : `数据来源：2468c.com`);
-}
-
-function renderGamesList() {
-  const data = state.games;
-  if (!data) return;
-
-  let list = [];
-  if (state.gamesTab === 'new') {
-    list = [
-      ...(data.todayPs5 || []).map((g) => ({ ...g, platform: 'PS5' })),
-      ...(data.todayPs4 || []).map((g) => ({ ...g, platform: 'PS4' }))
-    ];
-  } else {
-    // 全量列表从快照加载（按需：通过 API 单独获取）
-    list = state.gamesFullList ? state.gamesFullList.filter((g) => g.platform === state.gamesTab.toUpperCase()) : [];
-    if (!list.length) {
-      // 提示用户同步后才能浏览全量
-      $('gamesList').innerHTML = `<div class="muted" style="padding:20px;text-align:center">请先点击「同步游戏」拉取完整列表。</div>`;
-      $('gamesEmpty').hidden = true;
-      return;
-    }
-  }
-
-  // 搜索过滤
-  const q = state.gamesSearch.trim().toLowerCase();
-  if (q) list = list.filter((g) => (g.title || '').toLowerCase().includes(q));
-
-  $('gamesEmpty').hidden = list.length > 0;
-  if (!list.length) {
-    $('gamesList').innerHTML = '';
-    return;
-  }
-
-  $('gamesList').innerHTML = list
-    .map((g) => {
-      const platform = g.platform || (state.gamesTab === 'ps5' ? 'PS5' : 'PS4');
-      const platClass = platform === 'PS5' ? 'plat-ps5' : 'plat-ps4';
-      const cover = g.cover
-        ? `<img class="gm-cover" src="${esc(g.cover)}" alt="" loading="lazy" onerror="this.style.display='none'"/>`
-        : `<div class="gm-cover gm-cover-placeholder">🎮</div>`;
-      return `
-        <a class="gm-card" href="${esc(g.url)}" target="_blank" rel="noopener">
-          ${cover}
-          <div class="gm-body">
-            <div class="gm-title">${esc(g.title || '(无标题)')}</div>
-            <div class="gm-meta">
-              <span class="gm-plat ${platClass}">${platform}</span>
-              <span class="gm-date muted">${esc((g.publishedAt || g.firstSeen || '').slice(0, 10))}</span>
-            </div>
-          </div>
-        </a>`;
-    })
-    .join('');
-}
-
-function openGamesModal() {
-  showModal('gamesModal');
-  fetchGames().then((data) => {
-    // 如果全量列表不存在，尝试加载快照
-    if (state.gamesTab !== 'new' && (!state.gamesFullList || !state.gamesFullList.length)) {
-      loadGamesSnapshot();
-    }
-    if (data.running) {
-      clearInterval(state.gamesPollTimer);
-      state.gamesPollTimer = setInterval(async () => {
-        try {
-          const d = await fetchGames();
-          if (!d.running) {
-            clearInterval(state.gamesPollTimer);
-            state.gamesPollTimer = null;
-            refreshData(true); // 刷新顶部徽章
-          }
-        } catch {}
-      }, 1500);
-    }
-  });
-}
-
-async function loadGamesSnapshot() {
-  try {
-    const res = await api('/api/games?full=1');
-    const ps5 = (res.ps5List || []).map((g) => ({ ...g, platform: 'PS5' }));
-    const ps4 = (res.ps4List || []).map((g) => ({ ...g, platform: 'PS4' }));
-    state.gamesFullList = [...ps5, ...ps4];
-  } catch {}
-}
-
-async function runGamesSync(quick) {
-  if (!state.games || state.games.running) return;
-  try {
-    await api('/api/games/sync', { method: 'POST', body: JSON.stringify({ quick: !!quick }) });
-    clearInterval(state.gamesPollTimer);
-    state.gamesPollTimer = setInterval(async () => {
-      try {
-        const data = await fetchGames();
-        if (!data.running) {
-          clearInterval(state.gamesPollTimer);
-          state.gamesPollTimer = null;
-          state.gamesFullList = null; // 强制重新加载快照
-          loadGamesSnapshot();
-          refreshData(true);
-          if (data.lastError) toast(`同步失败：${data.lastError}`, 'error');
-          else toast(`游戏同步完成，今日新增 ${data.todayTotal} 个`, 'success');
-        }
-      } catch {}
-    }, 1500);
-  } catch (err) {
-    toast(`同步启动失败：${err.message}`, 'error');
-    fetchGames();
   }
 }
 
@@ -1437,25 +1298,8 @@ function bindEvents() {
   $('cheatsBtn').addEventListener('click', openCheatsModal);
   $('cheatsSync').addEventListener('click', runCheatsSync);
   $('cheatsOpenDir').addEventListener('click', openCheatsDir);
+  $('cheatsKylin').addEventListener('click', runKylinPrep);
   $('cheatsTranslate').addEventListener('click', runTitleTranslate);
-  $('gamesBtn').addEventListener('click', openGamesModal);
-  $('gamesSync').addEventListener('click', () => runGamesSync(false));
-  $('gamesSyncQuick').addEventListener('click', () => runGamesSync(true));
-  $('gamesTabs').addEventListener('click', (event) => {
-    const btn = event.target.closest('button[data-tab]');
-    if (!btn) return;
-    state.gamesTab = btn.dataset.tab;
-    if (state.gamesTab !== 'new' && (!state.gamesFullList || !state.gamesFullList.length)) {
-      loadGamesSnapshot().then(renderGamesList);
-    } else {
-      renderGamesList();
-    }
-    renderGamesModal();
-  });
-  $('gamesSearch').addEventListener('input', (e) => {
-    state.gamesSearch = e.target.value;
-    renderGamesList();
-  });
   $('historyBtn').addEventListener('click', openHistoryModal);
   $('historySearch').addEventListener('input', (e) => {
     state.historySearch = e.target.value;

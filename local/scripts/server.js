@@ -84,6 +84,119 @@ function sanitizeSegment(value, fallback) {
   return s;
 }
 
+/* ---------- 下载文件名：只用「插件名 + 版本号」 ---------- */
+// 不带作者/owner，不带 PS5、PS4 之类的平台修饰；插件名已含版本号时不再追加 tag；
+// 其他多余内容一律不拼，仅当同一插件多个附件重名时才补一个区分词。
+const PLATFORM_WORDS = ['ps5', 'ps4', 'ps3', 'psvita', 'playstation'];
+const META_SUFFIXES = new Set(['json', 'sha256', 'sha1', 'md5', 'sum', 'txt', 'sig', 'asc']);
+const FILE_SUFFIXES = /^(elf|plugin|zip|7z|rar|exe|bin|iso|pkg|apk|db|exfat|img)$/i;
+
+// 去掉以分隔符隔开的平台词，[PS5]、(PS5) 这类包裹也去掉；
+// 紧贴其他字母的（如 LibrePadPS5）视为名称本身，不动。
+function stripPlatformWords(name) {
+  let s = String(name || '');
+  s = s.replace(/[\[(]\s*(ps5|ps4|ps3|psvita|playstation)\s*[\])]/gi, ' ');
+  for (const word of PLATFORM_WORDS) {
+    s = s.replace(new RegExp('(^|[\\s._-])' + word + '(?=$|[\\s._-])', 'gi'), '$1');
+  }
+  return s.replace(/[\s._-]{2,}/g, '-').replace(/^[-\s._]+|[-\s._]+$/g, '');
+}
+
+// 插件名里是否已经带版本号（1.2.3 / v1.64 / 00.007.000 / v2.0.0-beta）
+function hasVersionInName(name) {
+  return /(?:^|[\s._-])v?\d+(?:[._]\d+)+(?=$|[\s._-])/i.test(String(name || ''));
+}
+
+// 附件后缀：一般取最后一段；.elf.json / .zip.sha256 这类保留两层；.tar.gz 整体保留
+function assetSuffix(assetName) {
+  const raw = String(assetName || '').trim();
+  const gz = raw.match(/(\.tar)?\.(gz|bz2|xz)$/i);
+  if (gz) return gz[0];
+  const tail = raw.match(/(\.[A-Za-z0-9_]+)+$/);
+  if (!tail) return '';
+  const parts = tail[0].slice(1).split('.');
+  const last = parts[parts.length - 1].toLowerCase();
+  if (parts.length >= 2 && META_SUFFIXES.has(last) && FILE_SUFFIXES.test(parts[parts.length - 2])) {
+    return '.' + parts.slice(-2).join('.');
+  }
+  return '.' + parts[parts.length - 1];
+}
+
+// 重名时才用的区分词：从附件名里剔除插件名、版本号、平台词后剩下的词
+function assetQualifier(assetName, pluginName, tagName) {
+  const norm = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+  const suffix = assetSuffix(assetName);
+  const base = suffix ? String(assetName).slice(0, -suffix.length) : String(assetName || '');
+  // 注意：ps4/ps5 在附件名里往往是区分词（chukei-ps4.elf / chukei-ps5.elf），这里不剔除
+  const stop = new Set(['v', 'source', 'plugin']);
+  for (const src of [pluginName, stripPlatformWords(pluginName), String(pluginName).replace(/[^A-Za-z0-9]+/g, '-'), tagName || '']) {
+    norm(src).split('-').filter(Boolean).forEach((w) => stop.add(w));
+  }
+  const rest = norm(base).split('-').filter((w) => w && w.length > 1 && !stop.has(w) && !/^[0-9]+$/.test(w));
+  // 优先去掉平台词（ps5 之类）；若去掉后不剩任何词（如 chukei-ps4 / chukei-ps5），则保留它
+  const noPlatform = rest.filter((w) => !PLATFORM_WORDS.includes(w));
+  return {
+    qualifier: (noPlatform.length ? noPlatform : rest).join('-'),
+    real: noPlatform.join('-')
+  };
+}
+
+// 计算一组附件的扁平文件名，返回 { display, names }
+function buildFlatNames(repoName, tagName, assets) {
+  const rawName = String(repoName || '').trim() || 'plugin';
+  const pluginName = stripPlatformWords(rawName) || rawName;
+  let display = pluginName;
+  if (!hasVersionInName(pluginName) && tagName) display = `${pluginName}_${tagName}`;
+  display = sanitizeSegment(display, 'plugin');
+  if (display.length > 100) display = display.slice(0, 100);
+
+  const entries = assets.map((asset, index) => {
+    const suffix = assetSuffix(asset.name);
+    const q = assetQualifier(asset.name, pluginName, tagName);
+    return {
+      index,
+      suffix,
+      qualifier: q.qualifier,
+      real: q.real,
+      plain: sanitizeSegment(display + suffix, 'asset')
+    };
+  });
+  const groups = new Map();
+  for (const e of entries) {
+    const k = e.plain.toLowerCase();
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(e);
+  }
+
+  const names = new Array(assets.length);
+  const used = new Set();
+  // 独一份的附件直接用它；没有扩展名的（如 SHA256SUMS）补区分词，避免出现无扩展名的文件
+  for (const e of entries) {
+    if (groups.get(e.plain.toLowerCase()).length > 1) continue;
+    const name = !e.suffix && e.qualifier ? sanitizeSegment(`${display}-${e.qualifier}`, 'asset') : e.plain;
+    names[e.index] = name;
+    used.add(name.toLowerCase());
+  }
+  // 同一插件多个同名附件：平台词之外没有区分词的那个保留原名（如 theme_v1.64.elf），
+  // 其余补区分词；若每个附件的区分词都有实际含义（如 ps4/ps5 两种 elf），则全部都补上
+  for (const list of groups.values()) {
+    if (list.length === 1) continue;
+    const plainEntry = list.some((e) => e.real) ? list.find((e) => !e.real) || null : null;
+    for (const e of list) {
+      let name;
+      if (e === plainEntry && !used.has(e.plain.toLowerCase())) {
+        name = e.plain;
+      } else {
+        name = sanitizeSegment(`${display}-${e.qualifier || 'part' + (e.index + 1)}${e.suffix}`, 'asset');
+        if (used.has(name.toLowerCase())) name = sanitizeSegment(`${display}-part${e.index + 1}${e.suffix}`, 'asset');
+      }
+      names[e.index] = name;
+      used.add(name.toLowerCase());
+    }
+  }
+  return { display, names };
+}
+
 // 打开文件时的路径解析：下载记录里的扁平文件名可能与磁盘实际文件名不一致，
 // 先精确匹配，再按分词包含关系宽松匹配一次，避免「文件不存在」。
 function resolveExistingFile(file, dir) {
@@ -206,6 +319,10 @@ const syncState = {
 // 金手指同步（HEN Cheats Collection）
 const CHEATS_REPO_URL = 'https://github.com/TeeKay87/HEN-Cheats-Collection.git';
 const CHEATS_DIR = path.join(LOCAL, 'cheats', 'HEN-Cheats-Collection');
+const CHEATS_SUB_DIR = path.join(CHEATS_DIR, 'cheats');
+const CHEATS_DATA_DIR = path.join(CHEATS_SUB_DIR, 'data');
+const KYLIN_OUT_DIR = path.join(CHEATS_DATA_DIR, 'kylin', 'cheats');
+const KYLIN_BAT_PATH = path.join(CHEATS_SUB_DIR, 'make_kylin_ready.bat');
 const CHEATS_HISTORY_PATH = path.join(STATE_DIR, 'cheats-history.json');
 const CHEATS_TITLE_ZH_PATH = path.join(STATE_DIR, 'cheats-title-zh.json');
 const DOWNLOAD_HISTORY_PATH = path.join(STATE_DIR, 'download-history.json');
@@ -215,84 +332,14 @@ const cheatsState = {
   finishedAt: null,
   output: '',
   lastError: null,
-  commit: null
+  commit: null,
+  kylinRunning: false,
+  kylinStartedAt: null,
+  kylinFinishedAt: null,
+  kylinOutput: '',
+  kylinLastError: null,
+  kylinFileCount: 0
 };
-
-// ---------- 游戏资源同步（2468c.com PS4/PS5） ----------
-const GAMES_SYNC_SCRIPT = path.join(__dirname, 'sync-games.js');
-const GAMES_SNAPSHOT_PATH = path.join(STATE_DIR, 'games-snapshot.json');
-const GAMES_DAILY_PATH = path.join(STATE_DIR, 'games-daily.json');
-const GAMES_LATEST_PATH = path.join(STATE_DIR, 'games-latest-sync.json');
-const gamesState = {
-  running: false,
-  startedAt: null,
-  finishedAt: null,
-  output: '',
-  lastError: null,
-  process: null
-};
-
-function gamesStatus() {
-  const snapshot = readJson(GAMES_SNAPSHOT_PATH, { ps5: [], ps4: [] });
-  const daily = readJson(GAMES_DAILY_PATH, { days: {} });
-  const latest = readJson(GAMES_LATEST_PATH, { at: null, ok: false });
-  const today = todayLocal();
-  const todayGames = daily.days && daily.days[today] ? daily.days[today] : { ps5: [], ps4: [] };
-  return {
-    ok: true,
-    snapshotUpdatedAt: snapshot.updatedAt || null,
-    ps5Total: (snapshot.ps5 || []).length,
-    ps4Total: (snapshot.ps4 || []).length,
-    todayDate: today,
-    todayPs5: todayGames.ps5 || [],
-    todayPs4: todayGames.ps4 || [],
-    todayTotal: (todayGames.ps5 || []).length + (todayGames.ps4 || []).length,
-    latest,
-    running: gamesState.running,
-    startedAt: gamesState.startedAt,
-    finishedAt: gamesState.finishedAt,
-    lastError: gamesState.lastError,
-    output: gamesState.output.slice(-4000)
-  };
-}
-
-function startGamesSync(quick) {
-  if (gamesState.running) return { started: false, running: true, message: '游戏同步已在进行' };
-  gamesState.running = true;
-  gamesState.startedAt = nowLocal();
-  gamesState.finishedAt = null;
-  gamesState.output = '';
-  gamesState.lastError = null;
-
-  const args = [...NODE_TLS_ARGS, GAMES_SYNC_SCRIPT];
-  if (quick) args.push('--quick');
-  const child = spawn(process.execPath, args, {
-    cwd: ROOT,
-    windowsHide: true,
-    stdio: ['ignore', 'pipe', 'pipe']
-  });
-  gamesState.process = child;
-
-  const collect = (buf) => {
-    gamesState.output += buf.toString('utf8');
-    if (gamesState.output.length > 12000) gamesState.output = gamesState.output.slice(-12000);
-  };
-  child.stdout.on('data', collect);
-  child.stderr.on('data', collect);
-  child.on('close', (code) => {
-    gamesState.running = false;
-    gamesState.finishedAt = nowLocal();
-    gamesState.process = null;
-    if (code !== 0) gamesState.lastError = `游戏同步脚本退出码 ${code}`;
-  });
-  child.on('error', (err) => {
-    gamesState.running = false;
-    gamesState.finishedAt = nowLocal();
-    gamesState.lastError = err.message;
-    gamesState.process = null;
-  });
-  return { started: true, running: true };
-}
 
 function gitExistsSync() {
   // 用 spawnSync 查 git 版本，判断是否安装
@@ -337,6 +384,10 @@ function cheatsStatus() {
       lastAt = st.mtimeMs;
     } catch {}
   }
+  // 服务重启后补充统计一次产物数量（之后走缓存，避免每次轮询都遍历）
+  if (!cheatsState.kylinRunning && !cheatsState.kylinFileCount && fs.existsSync(KYLIN_OUT_DIR)) {
+    cheatsState.kylinFileCount = countFilesIn(KYLIN_OUT_DIR);
+  }
   return {
     localPath: CHEATS_DIR,
     exists,
@@ -349,8 +400,104 @@ function cheatsStatus() {
     lastSyncedAt: cheatsState.finishedAt,
     running: cheatsState.running,
     output: cheatsState.output.slice(-4000),
-    lastError: cheatsState.lastError
+    lastError: cheatsState.lastError,
+    kylinAvailable: exists && fs.existsSync(KYLIN_BAT_PATH),
+    kylinDataExists: fs.existsSync(CHEATS_DATA_DIR),
+    kylinRunning: cheatsState.kylinRunning,
+    kylinFinishedAt: cheatsState.kylinFinishedAt,
+    kylinOutput: cheatsState.kylinOutput.slice(-4000),
+    kylinLastError: cheatsState.kylinLastError,
+    kylinFileCount: cheatsState.kylinFileCount
   };
+}
+
+function countFilesIn(dir) {
+  let n = 0;
+  const walk = (d) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(path.join(d, entry.name));
+      else n++;
+    }
+  };
+  try { walk(dir); } catch {}
+  return n;
+}
+
+// 整理金手指（kylin）：先删除 cheats\data，再执行 cheats\make_kylin_ready.bat
+function startKylinPrep() {
+  if (!fs.existsSync(CHEATS_DIR)) {
+    return { started: false, message: '尚未同步金手指，请先点击「同步金手指」' };
+  }
+  if (!fs.existsSync(KYLIN_BAT_PATH)) {
+    return { started: false, message: '未找到 make_kylin_ready.bat，请先同步金手指' };
+  }
+  if (cheatsState.running || cheatsState.kylinRunning) {
+    return { started: false, running: true, message: '已有金手指任务正在执行，请稍候' };
+  }
+
+  cheatsState.kylinRunning = true;
+  cheatsState.kylinStartedAt = nowLocal();
+  cheatsState.kylinFinishedAt = null;
+  cheatsState.kylinOutput = '';
+  cheatsState.kylinLastError = null;
+  cheatsState.kylinFileCount = 0;
+
+  // 1) 删除 data 目录（首次同步时不存在，容错跳过）
+  if (fs.existsSync(CHEATS_DATA_DIR)) {
+    try {
+      fs.rmSync(CHEATS_DATA_DIR, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
+      cheatsState.kylinOutput += '已删除 data 目录：' + CHEATS_DATA_DIR + '\r\n';
+    } catch (err) {
+      cheatsState.kylinRunning = false;
+      cheatsState.kylinFinishedAt = nowLocal();
+      cheatsState.kylinLastError = '删除 data 目录失败：' + err.message;
+      return { started: false, message: cheatsState.kylinLastError };
+    }
+  } else {
+    cheatsState.kylinOutput += '未发现 data 目录（首次整理），跳过删除。\r\n';
+  }
+
+  // 2) 执行 make_kylin_ready.bat
+  // 脚本末尾有 pause，用 < nul 让它在无控制台输入时立即返回。
+  const child = spawn('cmd.exe', ['/d', '/s', '/c', '""' + KYLIN_BAT_PATH + '" < nul"'], {
+    cwd: CHEATS_SUB_DIR,
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsVerbatimArguments: true
+  });
+
+  // 逐文件日志里的中文路径在 cmd 控制台下是乱码，只保留汇总信息
+  let pendingLine = '';
+  const collect = (buf) => {
+    pendingLine += buf.toString('utf8');
+    const parts = pendingLine.split(/\r?\n/);
+    pendingLine = parts.pop();
+    for (const line of parts) {
+      if (/^Copied:\s+"/.test(line)) continue;
+      if (!line.trim()) continue;
+      cheatsState.kylinOutput += line + '\r\n';
+    }
+    if (cheatsState.kylinOutput.length > 12000) {
+      cheatsState.kylinOutput = cheatsState.kylinOutput.slice(-12000);
+    }
+  };
+
+  child.stdout.on('data', collect);
+  child.stderr.on('data', collect);
+  child.on('error', (err) => {
+    cheatsState.kylinRunning = false;
+    cheatsState.kylinFinishedAt = nowLocal();
+    cheatsState.kylinLastError = err.message;
+  });
+  child.on('close', (code) => {
+    if (pendingLine.trim()) cheatsState.kylinOutput += pendingLine.trim() + '\r\n';
+    cheatsState.kylinRunning = false;
+    cheatsState.kylinFinishedAt = nowLocal();
+    cheatsState.kylinFileCount = fs.existsSync(KYLIN_OUT_DIR) ? countFilesIn(KYLIN_OUT_DIR) : 0;
+    if (code !== 0) cheatsState.kylinLastError = 'make_kylin_ready.bat 退出码 ' + code;
+  });
+
+  return { started: true };
 }
 
 function startCheatsSync() {
@@ -1074,37 +1221,34 @@ async function runJob(job, tasks) {
     byRepo.get(task.repo.key).assets.push(task.asset);
   }
 
-  // 扁平下载：所有文件都放在 targetDir 根目录，文件名拼上 {owner_repo}_{tag}_{originalFilename}
-  // 方便用户浏览和查找
+  // 扁平下载：所有文件都放在 targetDir 根目录，文件名只用「插件名 + 版本号」
+  // （不带作者/owner，也不带 PS5 之类的前缀；同组附件重名时才补区分词）
   const groups = [...byRepo.values()];
   groups.forEach(({ repo, assets }, itemIndex) => {
-    const tag = sanitizeSegment(repo.latestRelease ? repo.latestRelease.tagName : 'no-release', 'no-release');
-    const ownerRepo = sanitizeSegment(String(repo.fullName || repo.name || 'repo').replace(/\//g, '_'), 'repo');
+    const tagName = repo.latestRelease ? repo.latestRelease.tagName : null;
+    const tag = tagName ? sanitizeSegment(tagName, '') : '';
+    const built = buildFlatNames(repo.name || repo.fullName, tag, assets);
     job.items.push({
       key: repo.key,
       fullName: repo.fullName,
       name: repo.name,
       categoryName: repo.categoryName,
-      tagName: repo.latestRelease ? repo.latestRelease.tagName : null,
+      tagName,
       dir: job.targetDir,
       repo,
-      flatPrefix: `${ownerRepo}_${tag}_`,
-      files: assets.map((a, fi) => {
-        const originalName = sanitizeSegment(a.name, 'asset');
-        const flatName = `${ownerRepo}_${tag}_${originalName}`;
-        return {
-          id: `i${itemIndex}f${fi}`,
-          fullName: repo.fullName,
-          name: a.name,
-          flatName,
-          size: a.size || 0,
-          status: 'pending',
-          received: 0,
-          error: null,
-          path: null,
-          cancelled: false
-        };
-      })
+      flatPrefix: built.display,
+      files: assets.map((a, fi) => ({
+        id: `i${itemIndex}f${fi}`,
+        fullName: repo.fullName,
+        name: a.name,
+        flatName: built.names[fi],
+        size: a.size || 0,
+        status: 'pending',
+        received: 0,
+        error: null,
+        path: null,
+        cancelled: false
+      }))
     });
   });
 
@@ -1309,7 +1453,6 @@ async function handleApi(req, res, pathname, searchParams) {
     const today = todayLocal();
     const day = daily.days && daily.days[today] ? daily.days[today] : null;
     const downloads = readJson(DOWNLOADS_PATH, {});
-    const games = gamesStatus();
     return sendJson(res, 200, {
       ok: Boolean(db && db.repos),
       needsSync: !db || !Array.isArray(db.repos),
@@ -1320,12 +1463,6 @@ async function handleApi(req, res, pathname, searchParams) {
       repos: db ? db.repos : [],
       today: day,
       sync: { ...sync, running: syncState.running, liveOutput: syncState.output.slice(-4000), lastError: syncState.lastError },
-      games: {
-        todayTotal: games.todayTotal,
-        ps5Total: games.ps5Total,
-        ps4Total: games.ps4Total,
-        running: games.running
-      },
       config: {
         downloadDir: cfg.downloadDir,
         deleteOldVersions: cfg.deleteOldVersions,
@@ -1480,6 +1617,12 @@ async function handleApi(req, res, pathname, searchParams) {
     return sendJson(res, result.started ? 200 : 400, result);
   }
 
+  // 整理金手指（kylin）：删除 data 后执行 make_kylin_ready.bat
+  if (pathname === '/api/cheats/kylin' && method === 'POST') {
+    const result = startKylinPrep();
+    return sendJson(res, result.started ? 200 : 400, result);
+  }
+
   // 手动触发游戏名翻译（补齐未翻译的标题）
   if (pathname === '/api/cheats/translate' && method === 'POST') {
     const result = startTitleTranslation();
@@ -1495,26 +1638,6 @@ async function handleApi(req, res, pathname, searchParams) {
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }
-  }
-
-  // ---------- 游戏资源同步（PS4/PS5） ----------
-  if (pathname === '/api/games' && method === 'GET') {
-    const status = gamesStatus();
-    if (searchParams.get('full') === '1') {
-      const snapshot = readJson(GAMES_SNAPSHOT_PATH, { ps5: [], ps4: [] });
-      return sendJson(res, 200, {
-        ...status,
-        ps5List: (snapshot.ps5 || []).map((g) => ({ ...g, platform: 'PS5' })),
-        ps4List: (snapshot.ps4 || []).map((g) => ({ ...g, platform: 'PS4' }))
-      });
-    }
-    return sendJson(res, 200, status);
-  }
-
-  if (pathname === '/api/games/sync' && method === 'POST') {
-    const body = await readBody(req).catch(() => ({}));
-    const result = startGamesSync(Boolean(body && body.quick));
-    return sendJson(res, result.started ? 200 : 400, result);
   }
 
   // 下载历史
