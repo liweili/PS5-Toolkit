@@ -11,6 +11,12 @@ PS5-Toolkit 是一个**完全本地运行**的 PS5 资源管理工具。它在�
 
 不依赖第三方服务、不需要登录账号、不上传任何数据。所有运行状态与下载记录保存在本地 `local/state/`，删除该目录即彻底清除。
 
+## 在线预览（只读）
+
+不想安装也可以先打开看看：**<https://liweili.github.io/PS5-Toolkit/>**
+
+线上是只读版本：浏览、搜索、筛选全部插件，点「下载」直接跳转 GitHub Release 附件。同步、金手指、下载记录、自定义下载目录这些依赖本地服务的功能仅在本地版可用。
+
 ## 下载安装
 
 前往 **[Releases](https://github.com/liweili/PS5-Toolkit/releases/latest)** 下载：
