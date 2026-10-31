@@ -101,6 +101,70 @@ async function api(path, options = {}) {
   return data;
 }
 
+/* ---------- 静态模式（GitHub Pages 等纯静态部署，无本地服务） ---------- */
+const STATIC_MODE = ['127.0.0.1', 'localhost', '0.0.0.0'].indexOf(location.hostname) === -1;
+
+async function loadStaticOverview() {
+  const res = await fetch('./data/repos-database.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`无法加载数据文件（HTTP ${res.status}）`);
+  const db = await res.json();
+  return {
+    ok: true,
+    staticMode: true,
+    categories: db.categories || [],
+    repos: db.repos || [],
+    today: null,
+    todayDate: todayLocal(),
+    config: { downloadDir: '', deleteOldVersions: false, autoSyncOnStart: false },
+    downloads: {},
+    sync: {},
+    sourceExportedAt: db.sourceExportedAt || db.generatedAt || null
+  };
+}
+
+function applyStaticMode() {
+  document.body.classList.add('static-mode');
+  const style = document.createElement('style');
+  style.textContent = `
+    body.static-mode #syncBtn,
+    body.static-mode #todayBtn,
+    body.static-mode #historyBtn,
+    body.static-mode #cheatsBtn,
+    body.static-mode #settingsBtn,
+    body.static-mode #openDirBtn,
+    body.static-mode .sync-state { display: none !important; }
+  `;
+  document.head.appendChild(style);
+}
+
+/* 静态模式下「下载」= 在浏览器打开 GitHub Release 附件直链 */
+function openReleaseAssets(items) {
+  const urls = [];
+  for (const item of items) {
+    const repo = repoByKey.get(item.key);
+    if (!repo || !repo.latestRelease) continue;
+    const assets = repo.latestRelease.assets || [];
+    const wanted = item.assetNames && item.assetNames.length
+      ? assets.filter((a) => item.assetNames.indexOf(a.name) !== -1)
+      : assets;
+    for (const a of wanted) {
+      if (a.downloadUrl) urls.push(a.downloadUrl);
+    }
+  }
+  if (!urls.length) {
+    toast('所选插件暂无可用的下载链接', 'error');
+    return;
+  }
+  urls.slice(0, 10).forEach((url, i) => {
+    setTimeout(() => window.open(url, '_blank', 'noopener'), i * 350);
+  });
+  if (urls.length > 10) {
+    toast(`已打开前 10 个下载链接，其余请点插件卡片进入 GitHub 页面下载`, 'info');
+  } else {
+    toast(`已在浏览器打开 ${urls.length} 个下载链接`, 'success');
+  }
+}
+
 function showModal(id) {
   const el = $(id);
   if (!el) return;
@@ -135,7 +199,7 @@ function hideLoading() {
 
 /* ---------- 数据加载 ---------- */
 async function refreshData(silent) {
-  const data = await api('/api/overview');
+  const data = STATIC_MODE ? await loadStaticOverview() : await api('/api/overview');
   state.overview = data;
   state.categories = Array.isArray(data.categories) ? data.categories : [];
   state.repos = Array.isArray(data.repos) ? data.repos : [];
@@ -522,8 +586,10 @@ function updateSelectionUI() {
   $('selectionBar').hidden = keys.length === 0;
   $('selCount').textContent = `已选 ${keys.length} 个插件`;
   $('selSize').textContent = formatSize(size);
-  $('selTarget').textContent = `下载到：${state.config.downloadDir || '未设置'}`;
-  $('selTarget').title = state.config.downloadDir || '';
+  $('selTarget').textContent = STATIC_MODE
+    ? '下载：在浏览器打开 GitHub Release 链接'
+    : `下载到：${state.config.downloadDir || '未设置'}`;
+  $('selTarget').title = STATIC_MODE ? 'GitHub Release' : state.config.downloadDir || '';
   $('downloadBtn').disabled = repos.length === 0;
   updateTodayFooter();
 }
@@ -553,6 +619,10 @@ async function startDownload(keys) {
 }
 
 async function doDownload(items) {
+  if (STATIC_MODE) {
+    openReleaseAssets(items);
+    return;
+  }
   try {
     const res = await api('/api/download', {
       method: 'POST',
@@ -1472,6 +1542,18 @@ function bindEvents() {
 /* ---------- 启动 ---------- */
 async function init() {
   bindEvents();
+  if (STATIC_MODE) {
+    applyStaticMode();
+    showLoading('正在加载插件数据...');
+    try {
+      await refreshData(true);
+      hideLoading();
+    } catch (err) {
+      hideLoading();
+      toast(`加载失败：${err.message}`, 'error');
+    }
+    return;
+  }
   showLoading('正在加载本地数据...');
   try {
     await refreshData(true);
