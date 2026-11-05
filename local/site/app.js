@@ -24,6 +24,7 @@ const state = {
   todayUpdated: new Set(),
   todayTab: 'all',
   syncRunning: false,
+  syncSlow: false,
   currentJob: null,
   pollTimer: null,
   jobDoneFor: null,
@@ -178,6 +179,35 @@ function hideModal(id) {
   el.hidden = true;
   const anyOpen = [...document.querySelectorAll('.modal-backdrop')].some((m) => !m.hidden);
   if (!anyOpen) document.body.style.overflow = '';
+}
+
+/* 轻量提示弹窗（网络超时等） */
+function showAlert(title, message) {
+  const id = 'alertModal';
+  const old = $(id);
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = id;
+  el.className = 'modal-backdrop';
+  el.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true">
+      <header class="modal-head">
+        <div><h2>${esc(title)}</h2></div>
+        <button class="icon-btn close" data-close="${id}" aria-label="关闭">×</button>
+      </header>
+      <div class="modal-body"><p class="alert-text">${esc(message)}</p></div>
+      <footer class="modal-foot">
+        <div class="foot-actions"><button class="btn primary" data-close="${id}">知道了</button></div>
+      </footer>
+    </div>`;
+  document.body.appendChild(el);
+  el.querySelectorAll('[data-close]').forEach((btn) => {
+    btn.addEventListener('click', () => hideModal(id));
+  });
+  el.addEventListener('click', (event) => {
+    if (event.target === el) hideModal(id);
+  });
+  showModal(id);
 }
 
 function showLoading(text) {
@@ -946,16 +976,24 @@ function updateSyncButton() {
 function updateSyncUI(sync) {
   const el = $('syncState');
   const text = $('syncText');
-  const running = Boolean(sync && sync.running);
-  const at = sync && sync.at ? String(sync.at) : '';
+  const info = sync || {};
+  const running = state.syncRunning || Boolean(info.running);
+  const at = info.at ? String(info.at) : '';
   const isToday = at.slice(0, 10) === todayLocal();
-  const stale = !running && (!at || !isToday || sync.ok === false);
+  const stale = !running && (!at || !isToday || info.ok === false);
+  const slow = running && (state.syncSlow || Boolean(info.network && info.network.slow));
 
-  el.classList.toggle('running', running);
+  el.classList.toggle('running', running && !slow);
+  el.classList.toggle('slow', slow);
   el.classList.toggle('stale', stale);
-  if (running) text.textContent = '正在同步上游仓库...';
-  else if (at) text.textContent = `上次同步：${at}`;
-  else text.textContent = '尚未同步';
+  if (running) {
+    const latency = info.network && info.network.latency ? `（${info.network.latency}ms）` : '';
+    text.textContent = slow ? `正在同步 · 当前网络状况不佳${latency}` : '正在同步上游仓库...';
+  } else if (at) {
+    text.textContent = `上次同步：${at}`;
+  } else {
+    text.textContent = '尚未同步';
+  }
 
   state.syncRunning = running;
   updateSyncButton();
@@ -964,6 +1002,7 @@ function updateSyncUI(sync) {
 async function pollSync() {
   for (let i = 0; i < 300; i++) {
     const sync = await api('/api/sync');
+    if (sync.running && sync.network && sync.network.slow) state.syncSlow = true;
     updateSyncUI(sync);
     if (!sync.running) return sync;
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -971,28 +1010,72 @@ async function pollSync() {
   throw new Error('同步超时，请稍后重试');
 }
 
+/* 同步结束后弹出结果通知：优先展示新增插件 */
+function notifySyncResult() {
+  const added = (state.today && state.today.added) || [];
+  const updated = (state.today && state.today.updated) || [];
+  if (added.length) {
+    toast(`同步完成：新增 ${added.length} 个插件${updated.length ? `，更新 ${updated.length} 个` : ''}`, 'success');
+    state.todayTab = 'added';
+    renderToday();
+    showModal('todayModal');
+    return;
+  }
+  if (updated.length) {
+    toast(`同步完成：${updated.length} 个插件有更新`, 'success');
+    state.todayTab = 'all';
+    renderToday();
+    showModal('todayModal');
+    return;
+  }
+  toast('同步完成，暂无新增或更新', 'info');
+}
+
+function showNetworkError(info) {
+  const timeout = Boolean(info && info.timeout);
+  const detail = (info && info.message) || '无法连接 GitHub';
+  showAlert(
+    timeout ? 'GitHub 连接超时' : '无法连接 GitHub',
+    `${detail}。\n同步已终止，请检查网络或代理后重试。`
+  );
+  toast(timeout ? 'GitHub 连接超时，同步已终止' : '无法连接 GitHub，同步已终止', 'error');
+}
+
 async function runSync(silent) {
+  if (state.syncRunning) {
+    if (!silent) toast('同步正在进行中，请稍候', 'info');
+    return null;
+  }
   state.syncRunning = true;
-  updateSyncButton();
+  state.syncSlow = false;
+  updateSyncUI({ running: true });
   try {
-    // 服务端已在同步时会直接返回 running，不会重复启动；这里仍发起请求，
-    // 随后统一轮询等待，避免页面加载时因「已在同步」而直接跳过、卡在同步中。
-    await api('/api/sync', { method: 'POST' });
+    // 服务端会先探测 GitHub 连通性，不通或超时会直接返回 networkError，不启动同步。
+    const start = await api('/api/sync', { method: 'POST' });
+    if (start && start.networkError) {
+      showNetworkError(start);
+      state.syncRunning = false;
+      state.syncSlow = false;
+      updateSyncUI((state.overview && state.overview.sync) || {});
+      return null;
+    }
+    if (start && start.network && start.network.slow) state.syncSlow = true;
+
     const sync = await pollSync();
+    await refreshData(true);
     if (sync.ok) {
-      if (!silent) toast(`同步完成：新增 ${sync.added || 0} 个，更新 ${sync.updated || 0} 个`, 'success');
+      notifySyncResult();
     } else {
       toast(`同步失败：${sync.lastError || sync.error || '请查看日志'}`, 'error');
     }
-    await refreshData(true);
-    if (!silent) maybeShowToday();
     return sync;
   } catch (err) {
     toast(`同步失败：${err.message}`, 'error');
     return null;
   } finally {
     state.syncRunning = false;
-    updateSyncButton();
+    state.syncSlow = false;
+    updateSyncUI({ ...((state.overview && state.overview.sync) || {}), running: false });
   }
 }
 
@@ -1539,6 +1622,26 @@ function bindEvents() {
   });
 }
 
+/* 服务端已在后台同步（如刚启动服务时触发的自动同步）：只轮询刷新，不遮挡页面 */
+async function watchRunningSync() {
+  state.syncRunning = true;
+  const syncInfo = (state.overview && state.overview.sync) || {};
+  if (syncInfo.network && syncInfo.network.slow) state.syncSlow = true;
+  updateSyncUI({ running: true, network: syncInfo.network });
+  try {
+    const sync = await pollSync();
+    await refreshData(true);
+    if (sync.ok) notifySyncResult();
+    else toast(`后台同步失败：${sync.lastError || sync.error || '请查看日志'}`, 'error');
+  } catch (err) {
+    toast(`等待同步失败：${err.message}`, 'error');
+  } finally {
+    state.syncRunning = false;
+    state.syncSlow = false;
+    updateSyncUI({ ...((state.overview && state.overview.sync) || {}), running: false });
+  }
+}
+
 /* ---------- 启动 ---------- */
 async function init() {
   bindEvents();
@@ -1554,56 +1657,41 @@ async function init() {
     }
     return;
   }
+
+  // 首屏只加载本地缓存数据，同步改为后台进行，不覆盖整屏
   showLoading('正在加载本地数据...');
   try {
     await refreshData(true);
-    const forceToday = new URLSearchParams(location.search).get('today') === '1';
-    let needSync = !state.overview || !state.overview.ok;
-
-    // 自动同步：每天第一次打开页面时，先同步一次再看今日更新，
-    // 避免打开时今日更新还是空数据。同步成功后才记录当天已同步。
-    const today = state.todayDate || todayLocal();
-    const lastAutoSync = localStorage.getItem('ps5_auto_sync_date');
-    const syncConfig = state.config || {};
-    if (!needSync && syncConfig.autoSyncOnStart && lastAutoSync !== today) {
-      needSync = true;
-    }
-
-    if (needSync) {
-      showLoading('正在同步上游仓库并生成中文数据...');
-      try {
-        const result = await runSync(true);
-        if (result && result.ok) localStorage.setItem('ps5_auto_sync_date', today);
-      } catch (err) {
-        toast(`自动同步失败：${err.message}`, 'error');
-      }
-      await refreshData(true);
-    }
-
-    // 页面加载时服务端可能已在后台同步（如刚启动服务触发的自动同步），
-    // 此时上面不一定会走 runSync，这里统一等待结束并刷新，避免停留在「同步中」。
-    if (state.syncRunning) {
-      showLoading('正在等待后台同步完成...');
-      try {
-        const sync = await pollSync();
-        if (sync && !sync.ok) {
-          toast(`后台同步失败：${sync.lastError || sync.error || '请查看日志'}`, 'error');
-        }
-      } catch (err) {
-        toast(`等待同步失败：${err.message}`, 'error');
-      }
-      await refreshData(true);
-    }
-
-    hideLoading();
-    if (state.overview && state.overview.ok) {
-      maybeShowToday(forceToday);
-    } else {
-      toast('本地数据尚未建立，请点击「立即同步」。', 'error');
-    }
   } catch (err) {
-    hideLoading();
     toast(`加载失败：${err.message}`, 'error');
+  } finally {
+    hideLoading();
+  }
+
+  const forceToday = new URLSearchParams(location.search).get('today') === '1';
+  const overviewOk = Boolean(state.overview && state.overview.ok);
+  const syncInfo = (state.overview && state.overview.sync) || {};
+  const today = state.todayDate || todayLocal();
+  const lastAutoSync = localStorage.getItem('ps5_auto_sync_date');
+  const syncConfig = state.config || {};
+  const autoSyncDue = syncConfig.autoSyncOnStart && lastAutoSync !== today;
+  const willSync = Boolean(syncInfo.running) || autoSyncDue || !overviewOk;
+
+  // 准备后台同步时，先不弹今日更新，等同步完成后统一弹出新增插件通知
+  if (!willSync && overviewOk) maybeShowToday(forceToday);
+  if (!overviewOk) toast('本地数据尚未建立，正在后台同步...', 'info');
+
+  // 服务端可能已在同步，此时只跟踪状态
+  if (syncInfo.running) {
+    watchRunningSync();
+    return;
+  }
+
+  // 后台自动同步：每天首次打开触发一次，同步完成后弹出新增插件通知
+  if (willSync) {
+    runSync(true).then((result) => {
+      if (result && result.ok) localStorage.setItem('ps5_auto_sync_date', today);
+    });
   }
 }
 

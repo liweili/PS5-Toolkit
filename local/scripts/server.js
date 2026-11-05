@@ -313,8 +313,86 @@ const syncState = {
   finishedAt: null,
   output: '',
   lastError: null,
+  network: null,
   process: null
 };
+
+// 同步前探测 GitHub 连通性：8 秒内没有响应即视为不可用，直接终止同步。
+// 同时探测直连与镜像，任一可用即通过（本机可能只能走 ghfast.top 镜像）。
+const SYNC_PROBE_URLS = [
+  'https://raw.githubusercontent.com/nexgen999/PS5-Repository-List/main/json/repos-database.json',
+  'https://ghfast.top/https://raw.githubusercontent.com/nexgen999/PS5-Repository-List/main/json/repos-database.json'
+];
+const SYNC_PROBE_TIMEOUT_MS = 8000;
+const SYNC_SLOW_LATENCY_MS = 1500;
+
+async function probeGithub(timeoutMs = SYNC_PROBE_TIMEOUT_MS) {
+  const startedAt = Date.now();
+  return new Promise((resolve) => {
+    let done = false;
+    const failures = [];
+    const controllers = [];
+    const finish = (result) => {
+      if (done) return;
+      done = true;
+      controllers.forEach((c) => {
+        try {
+          c.abort();
+        } catch {}
+      });
+      resolve(result);
+    };
+
+    for (const url of SYNC_PROBE_URLS) {
+      const controller = new AbortController();
+      controllers.push(controller);
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const t0 = Date.now();
+      fetch(url, {
+        headers: { 'User-Agent': 'PS5-Local-Hub/1.0' },
+        signal: controller.signal
+      })
+        .then((res) => {
+          const latency = Date.now() - t0;
+          if (res.body && res.body.cancel) res.body.cancel().catch(() => {});
+          if (!res.ok && res.status !== 206) {
+            throw new Error(`GitHub 响应异常（HTTP ${res.status}）`);
+          }
+          finish({
+            ok: true,
+            latency: Date.now() - startedAt,
+            slow: Date.now() - startedAt > SYNC_SLOW_LATENCY_MS,
+            url
+          });
+        })
+        .catch((err) => {
+          const timeout = Boolean(
+            err && (err.name === 'AbortError' || /abort|timeout/i.test(String(err.message)))
+          );
+          failures.push({
+            url,
+            latency: Date.now() - t0,
+            timeout,
+            reason: timeout ? '连接超时' : `无法连接：${(err && err.message) || err}`
+          });
+          if (failures.length === SYNC_PROBE_URLS.length) {
+            const timedOut = failures.some((f) => f.timeout);
+            finish({
+              ok: false,
+              latency: Date.now() - startedAt,
+              timeout: timedOut,
+              reason: timedOut
+                ? `GitHub 连接超时（超过 ${Math.round(timeoutMs / 1000)} 秒无响应）`
+                : `无法连接 GitHub：${failures[0].reason}`
+            });
+          }
+        })
+        .finally(() => {
+          clearTimeout(timer);
+        });
+    }
+  });
+}
 
 // 金手指同步（HEN Cheats Collection）
 const CHEATS_REPO_URL = 'https://github.com/TeeKay87/HEN-Cheats-Collection.git';
@@ -842,7 +920,7 @@ function latestSync() {
   return readJson(SYNC_PATH, { at: null, ok: false, firstRun: false });
 }
 
-function startSync() {
+function startSync(network) {
   if (syncState.running) {
     return { started: false, running: true, message: '同步任务已在运行' };
   }
@@ -851,6 +929,7 @@ function startSync() {
   syncState.finishedAt = null;
   syncState.output = '';
   syncState.lastError = null;
+  syncState.network = network || null;
 
   const child = spawn(process.execPath, [...NODE_TLS_ARGS, SYNC_SCRIPT], {
     cwd: ROOT,
@@ -894,9 +973,15 @@ function maybeAutoSync() {
     if (!sameDay || !Number.isFinite(hours) || hours >= Number(cfg.syncIfOlderThanHours || 6)) needed = true;
   }
   if (needed) {
-    setTimeout(() => {
+    setTimeout(async () => {
+      const net = await probeGithub();
+      if (!net.ok) {
+        console.log(`[服务端] 自动同步已终止：${net.reason}`);
+        syncState.lastError = net.reason;
+        return;
+      }
       console.log('[服务端] 数据不是今天或已过期，自动开始同步...');
-      startSync();
+      startSync(net);
     }, 800);
   }
 }
@@ -1462,7 +1547,13 @@ async function handleApi(req, res, pathname, searchParams) {
       categories: db ? db.categories : [],
       repos: db ? db.repos : [],
       today: day,
-      sync: { ...sync, running: syncState.running, liveOutput: syncState.output.slice(-4000), lastError: syncState.lastError },
+      sync: {
+        ...sync,
+        running: syncState.running,
+        network: syncState.network,
+        liveOutput: syncState.output.slice(-4000),
+        lastError: syncState.lastError
+      },
       config: {
         downloadDir: cfg.downloadDir,
         deleteOldVersions: cfg.deleteOldVersions,
@@ -1481,13 +1572,30 @@ async function handleApi(req, res, pathname, searchParams) {
       startedAt: syncState.startedAt,
       finishedAt: syncState.finishedAt,
       lastError: syncState.lastError,
+      network: syncState.network,
       output: syncState.output.slice(-4000)
     });
   }
 
   if (pathname === '/api/sync' && method === 'POST') {
-    const result = startSync();
-    return sendJson(res, 200, result);
+    if (syncState.running) {
+      return sendJson(res, 200, { started: false, running: true, message: '同步任务已在运行' });
+    }
+    // 先探测 GitHub：不通 / 超时则直接终止，不启动同步脚本
+    const net = await probeGithub();
+    if (!net.ok) {
+      syncState.lastError = net.reason;
+      return sendJson(res, 200, {
+        started: false,
+        running: false,
+        networkError: true,
+        timeout: Boolean(net.timeout),
+        message: net.reason,
+        latency: net.latency
+      });
+    }
+    const result = startSync(net);
+    return sendJson(res, 200, { ...result, network: net });
   }
 
   if (pathname === '/api/config' && method === 'GET') {

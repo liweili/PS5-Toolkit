@@ -184,6 +184,17 @@ button {
   animation: pulse 1.1s infinite;
 }
 
+/* 网络状况不佳：橙黄色提示 */
+.sync-state.slow {
+  color: var(--amber);
+}
+
+.sync-state.slow .dot {
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(255, 182, 72, 0.7);
+  animation: pulse 1.1s infinite;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
@@ -1429,6 +1440,13 @@ button {
 }
 
 /* ---------- 加载遮罩 ---------- */
+.alert-text {
+  white-space: pre-line;
+  line-height: 1.7;
+  font-size: 13px;
+  color: var(--text);
+}
+
 .loading-mask {
   position: fixed;
   inset: 0;
